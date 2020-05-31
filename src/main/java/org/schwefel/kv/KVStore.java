@@ -247,6 +247,7 @@ public final class KVStore implements StoreOps {
                 long delta = System.nanoTime() - start;
                 stats.allOpsTimeNanos.accept(delta);
                 stats.batchTimeNanos.accept(delta);
+                occasionalWalSync();
             }
         }
     }
