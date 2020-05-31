@@ -282,26 +282,19 @@ public final class KVStore implements StoreOps {
 
     @Override
     public synchronized void flush() {
-        if (isOpen()) {
-            long start = System.nanoTime();
-            try {
-                txnDb.flush(flushOptions);
-            } catch (RocksDBException e) {
-                throw new StoreException(e);
-            } finally {
-                long delta = System.nanoTime() - start;
-                stats.allOpsTimeNanos.accept(delta);
-                stats.flushTimeNanos.accept(delta);
-            }
-        }
+        flush_(flushOptions);
     }
 
     @Override
     public synchronized void flushNoWait() {
+        flush_(flushOptionsNoWait);
+    }
+
+    private void flush_(FlushOptions flushOptions) {
         if (isOpen()) {
             long start = System.nanoTime();
             try {
-                txnDb.flush(flushOptionsNoWait);
+                txnDb.flush(flushOptions);
             } catch (RocksDBException e) {
                 throw new StoreException(e);
             } finally {
