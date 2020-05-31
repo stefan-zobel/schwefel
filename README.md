@@ -1,2 +1,2 @@
 # schwefel
-A dead simple Java RocksDB wrapper
+A dead simple RocksDB Java wrapper
