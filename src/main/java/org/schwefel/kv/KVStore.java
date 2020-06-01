@@ -322,6 +322,18 @@ public final class KVStore implements StoreOps {
     }
 
     @Override
+    public ForEachKeyValue scanAll(byte[] beginKey) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ForEachKeyValue scanRange(byte[] beginKey, byte[] endKey) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
     public Batch createBatch() {
         return new BatchImpl();
     }
