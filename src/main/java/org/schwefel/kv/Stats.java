@@ -67,6 +67,14 @@ public class Stats {
         return allOpsTimeNanos;
     }
 
+    public double getAverageWalIntervalMillis() {
+        long walCount = walTimeNanos.getCount();
+        if (walCount > 0L) {
+            return (allOpsTimeNanos.getSum() - walTimeNanos.getSum()) / (1_000_000.0 * walCount);
+        }
+        return Double.MAX_VALUE;
+    }
+
     public int openCursorsCount() {
         return unclosedCursorsCount.get();
     }
