@@ -323,25 +323,31 @@ public final class KVStore implements StoreOps {
     }
 
     @Override
-    public ForEachKeyValue scanAll() {
+    public synchronized ForEachKeyValue scanAll() {
         // TODO ???
+        validateOpen();
         RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
         it.seekToFirst();
         return new ForEachAll(it);
     }
 
     @Override
-    public ForEachKeyValue scanAll(byte[] beginKey) {
+    public synchronized ForEachKeyValue scanAll(byte[] beginKey) {
         // TODO ???
         Objects.requireNonNull(beginKey, "beginKey cannot be null");
+        validateOpen();
         RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
         it.seek(beginKey);
         return new ForEachAll(it);
     }
 
     @Override
-    public ForEachKeyValue scanRange(byte[] beginKey, byte[] endKey) {
-        // TODO Auto-generated method stub
+    public synchronized ForEachKeyValue scanRange(byte[] beginKey, byte[] endKey) {
+        // TODO ???
+        Objects.requireNonNull(beginKey, "beginKey cannot be null");
+        Objects.requireNonNull(endKey, "endKey cannot be null");
+        validateOpen();
+
         return null;
     }
 

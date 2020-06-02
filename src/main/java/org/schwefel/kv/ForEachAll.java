@@ -15,7 +15,9 @@ class ForEachAll implements ForEachKeyValue {
 
     @Override
     public synchronized void close() {
-        iter.close();
+        if (iter.isOwningHandle()) {
+            iter.close();
+        }
     }
 
     @Override
@@ -25,6 +27,7 @@ class ForEachAll implements ForEachKeyValue {
             action.accept(iter.key(), iter.value());
             iter.next();
         }
+        close();
     }
 
     @Override
