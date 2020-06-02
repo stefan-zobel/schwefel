@@ -23,28 +23,12 @@ import java.util.logging.Logger;
 import org.rocksdb.RocksIterator;
 
 // TODO: not sure if this overcautious early closing approach is a good idea
-class ForEachAll implements ForEachKeyValue {
+class ForEachAll extends AbstractForEach {
 
     private static final Logger logger = Logger.getLogger(ForEachAll.class.getName());
 
-    private volatile RocksIterator iter;
-    private final Stats stats;
-
     ForEachAll(RocksIterator iter, Stats stats) {
-        this.iter = Objects.requireNonNull(iter);
-        this.stats = stats;
-    }
-
-    @Override
-    public synchronized void close() {
-        if (isOpen() && iter.isOwningHandle()) {
-            try {
-                iter.close();
-                stats.decOpenCursorsCount();
-            } finally {
-                iter = null;
-            }
-        }
+        super(iter, stats);
     }
 
     @Override
@@ -81,15 +65,5 @@ class ForEachAll implements ForEachKeyValue {
         }
         close();
         return false;
-    }
-
-    private boolean isOpen() {
-        return iter != null;
-    }
-
-    private void checkOpen() {
-        if (!isOpen()) {
-            throw new StoreException("ForEachKeyValue is exhausted or closed");
-        }
     }
 }
