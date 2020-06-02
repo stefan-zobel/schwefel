@@ -25,6 +25,7 @@ import org.rocksdb.FlushOptions;
 import org.rocksdb.Options;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDBException;
+import org.rocksdb.RocksIterator;
 import org.rocksdb.Transaction;
 import org.rocksdb.TransactionDB;
 import org.rocksdb.TransactionDBOptions;
@@ -322,9 +323,20 @@ public final class KVStore implements StoreOps {
     }
 
     @Override
+    public ForEachKeyValue scanAll() {
+        // TODO ???
+        RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
+        it.seekToFirst();
+        return new ForEachAll(it);
+    }
+
+    @Override
     public ForEachKeyValue scanAll(byte[] beginKey) {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO ???
+        Objects.requireNonNull(beginKey, "beginKey cannot be null");
+        RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
+        it.seek(beginKey);
+        return new ForEachAll(it);
     }
 
     @Override

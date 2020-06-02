@@ -26,6 +26,7 @@ public interface StoreOps extends AutoCloseable {
     void update(byte[] key, byte[] value);
     Batch createBatch();
     void writeBatch(Batch batch);
+    ForEachKeyValue scanAll();
     ForEachKeyValue scanAll(byte[] beginKey);
     ForEachKeyValue scanRange(byte[] beginKey, byte[] endKey);
 //  Tx startTx(); // ???
