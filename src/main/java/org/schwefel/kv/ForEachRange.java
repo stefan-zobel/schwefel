@@ -14,10 +14,12 @@ class ForEachRange implements ForEachKeyValue {
 
     private volatile RocksIterator iter;
     private final byte[] endExclusive;
+    private final Stats stats;
 
-    ForEachRange(RocksIterator iter, byte[] endKey) {
+    ForEachRange(RocksIterator iter, byte[] endKey, Stats stats) {
         this.iter = Objects.requireNonNull(iter);
         this.endExclusive = Objects.requireNonNull(endKey, "endKey cannot be null");
+        this.stats = stats;
     }
 
     @Override
@@ -25,6 +27,7 @@ class ForEachRange implements ForEachKeyValue {
         if (isOpen() && iter.isOwningHandle()) {
             try {
                 iter.close();
+                stats.decOpenCursorsCount();
             } finally {
                 iter = null;
             }

@@ -15,6 +15,8 @@
  */
 package org.schwefel.kv;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import net.volcanite.util.DoubleStatistics;
 
 public class Stats {
@@ -27,6 +29,7 @@ public class Stats {
     final DoubleStatistics walTimeNanos = DoubleStatistics.newInstance();
     final DoubleStatistics flushTimeNanos = DoubleStatistics.newInstance();
     final DoubleStatistics allOpsTimeNanos = DoubleStatistics.newInstance();
+    final AtomicInteger unclosedCursorsCount = new AtomicInteger(); 
 
     public Stats() {
         //
@@ -62,5 +65,17 @@ public class Stats {
 
     public DoubleStatistics getAllOpsTimeNanos() {
         return allOpsTimeNanos;
+    }
+
+    public int openCursorsCount() {
+        return unclosedCursorsCount.get();
+    }
+
+    void incOpenCursorsCount() {
+        unclosedCursorsCount.incrementAndGet();
+    }
+
+    void decOpenCursorsCount() {
+        unclosedCursorsCount.decrementAndGet();
     }
 }

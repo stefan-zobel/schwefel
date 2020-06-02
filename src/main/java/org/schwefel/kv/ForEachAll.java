@@ -13,9 +13,11 @@ class ForEachAll implements ForEachKeyValue {
     private static final Logger logger = Logger.getLogger(ForEachAll.class.getName());
 
     private volatile RocksIterator iter;
+    private final Stats stats;
 
-    ForEachAll(RocksIterator iter) {
+    ForEachAll(RocksIterator iter, Stats stats) {
         this.iter = Objects.requireNonNull(iter);
+        this.stats = stats;
     }
 
     @Override
@@ -23,6 +25,7 @@ class ForEachAll implements ForEachKeyValue {
         if (isOpen() && iter.isOwningHandle()) {
             try {
                 iter.close();
+                stats.decOpenCursorsCount();
             } finally {
                 iter = null;
             }

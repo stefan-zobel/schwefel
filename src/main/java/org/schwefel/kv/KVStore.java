@@ -327,8 +327,9 @@ public final class KVStore implements StoreOps {
         // TODO ???
         validateOpen();
         RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
+        stats.incOpenCursorsCount();
         it.seekToFirst();
-        return new ForEachAll(it);
+        return new ForEachAll(it, stats);
     }
 
     @Override
@@ -337,8 +338,9 @@ public final class KVStore implements StoreOps {
         Objects.requireNonNull(beginKey, "beginKey cannot be null");
         validateOpen();
         RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
+        stats.incOpenCursorsCount();
         it.seek(beginKey);
-        return new ForEachAll(it);
+        return new ForEachAll(it, stats);
     }
 
     @Override
@@ -347,8 +349,10 @@ public final class KVStore implements StoreOps {
         Objects.requireNonNull(beginKey, "beginKey cannot be null");
         Objects.requireNonNull(endKey, "endKey cannot be null");
         validateOpen();
-
-        return null;
+        RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
+        stats.incOpenCursorsCount();
+        it.seek(beginKey);
+        return new ForEachRange(it, endKey, stats);
     }
 
     @Override
