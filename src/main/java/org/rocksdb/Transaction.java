@@ -45,7 +45,7 @@ public class Transaction extends RocksObject {
 
   /**
    * If a transaction has a snapshot set, the transaction will ensure that
-   * any keys successfully written(or fetched via {@link #getForUpdate}) have
+   * any keys successfully written (or fetched via {@link #getForUpdate}) have
    * not been modified outside of this transaction since the time the snapshot
    * was set.
    *
