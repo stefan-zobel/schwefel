@@ -92,8 +92,9 @@ public class Stats {
         unclosedCursorsCount.decrementAndGet();
     }
 
-    void incOpenTxCount() {
+    Stats incOpenTxCount() {
         openTransactions.incrementAndGet();
+        return this;
     }
 
     void decOpenTxCount() {

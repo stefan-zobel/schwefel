@@ -29,7 +29,7 @@ public interface StoreOps extends AutoCloseable {
     ForEachKeyValue scanAll();
     ForEachKeyValue scanAll(byte[] beginKey);
     ForEachKeyValue scanRange(byte[] beginKey, byte[] endKey);
-//  Tx startTx(); // ???
+    Tx startTx();
     void syncWAL();
     boolean isOpen();
     void flush();
