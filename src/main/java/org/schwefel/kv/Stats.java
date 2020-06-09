@@ -29,7 +29,8 @@ public class Stats {
     final DoubleStatistics walTimeNanos = DoubleStatistics.newInstance();
     final DoubleStatistics flushTimeNanos = DoubleStatistics.newInstance();
     final DoubleStatistics allOpsTimeNanos = DoubleStatistics.newInstance();
-    final AtomicInteger unclosedCursorsCount = new AtomicInteger(); 
+    final AtomicInteger unclosedCursorsCount = new AtomicInteger();
+    final AtomicInteger openTransactions = new AtomicInteger();
 
     public Stats() {
         //
@@ -79,11 +80,23 @@ public class Stats {
         return unclosedCursorsCount.get();
     }
 
+    public int openTransactionsCount() {
+        return openTransactions.get();
+    }
+
     void incOpenCursorsCount() {
         unclosedCursorsCount.incrementAndGet();
     }
 
     void decOpenCursorsCount() {
         unclosedCursorsCount.decrementAndGet();
+    }
+
+    void incOpenTxCount() {
+        openTransactions.incrementAndGet();
+    }
+
+    void decOpenTxCount() {
+        openTransactions.decrementAndGet();
     }
 }
