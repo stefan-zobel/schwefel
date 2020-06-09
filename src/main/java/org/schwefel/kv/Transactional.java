@@ -1,18 +1,36 @@
+/*
+ * Copyright 2020 Stefan Zobel
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.schwefel.kv;
 
 import java.util.Objects;
 
+import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.Transaction;
 
 class Transactional implements Tx {
 
-    private Transaction txn = null;
+    private volatile Transaction txn = null;
+    private final ReadOptions readOptions;
     private final Stats stats;
 
-    Transactional(Transaction txn, Stats stats) {
+    Transactional(Transaction txn, ReadOptions readOptions, Stats stats) {
         this.txn = Objects.requireNonNull(txn);
         this.stats = Objects.requireNonNull(stats).incOpenTxCount();
+        this.readOptions = Objects.requireNonNull(readOptions);
     }
 
     @Override
@@ -78,85 +96,125 @@ class Transactional implements Tx {
     public synchronized void put(byte[] key, byte[] value) {
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
-        // TODO Auto-generated method stub
-
+        try {
+            txn.put(key, value);
+        } catch (RocksDBException e) {
+            throw new StoreException(e);
+        }
     }
 
     @Override
     public synchronized byte[] get(byte[] key) {
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
-        // TODO Auto-generated method stub
-        return null;
+        validateReadOptions();
+        try {
+            return txn.get(readOptions, key);
+        } catch (RocksDBException e) {
+            throw new StoreException(e);
+        }
     }
 
     @Override
     public synchronized byte[][] multiGet(byte[][] keys) {
         Objects.requireNonNull(keys, "keys cannot be null");
+        checkInnerKeys(keys);
         validateOwned();
-        // TODO Auto-generated method stub
-        return null;
+        validateReadOptions();
+        try {
+            return txn.multiGet(readOptions, keys);
+        } catch (RocksDBException e) {
+            throw new StoreException(e);
+        }
     }
 
     @Override
-    public synchronized byte[] getForUpdate(byte[] key) {
-        Objects.requireNonNull(key, "key cannot be null");
-        validateOwned();
-        // TODO Auto-generated method stub
-        return null;
+    public byte[] getForUpdate(byte[] key) {
+        return getForUpdate(key, true);
     }
 
     @Override
     public synchronized byte[] getForUpdate(byte[] key, boolean exclusive) {
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
-        // TODO Auto-generated method stub
-        return null;
+        validateReadOptions();
+        try {
+            return txn.getForUpdate(readOptions, key, exclusive);
+        } catch (RocksDBException e) {
+            throw new StoreException(e);
+        }
     }
 
     @Override
     public synchronized byte[][] multiGetForUpdate(byte[][] keys) {
         Objects.requireNonNull(keys, "keys cannot be null");
+        checkInnerKeys(keys);
         validateOwned();
-        // TODO Auto-generated method stub
-        return null;
+        validateReadOptions();
+        try {
+            return txn.multiGetForUpdate(readOptions, keys);
+        } catch (RocksDBException e) {
+            throw new StoreException(e);
+        }
     }
 
     @Override
     public synchronized void undoGetForUpdate(byte[] key) {
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
-        // TODO Auto-generated method stub
-
+        txn.undoGetForUpdate(key);
     }
 
     @Override
     public synchronized void delete(byte[] key) {
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
-        // TODO Auto-generated method stub
-
+        try {
+            txn.delete(key);
+        } catch (RocksDBException e) {
+            throw new StoreException(e);
+        }
     }
 
     @Override
     public synchronized void singleDelete(byte[] key) {
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
-        // TODO Auto-generated method stub
-
+        try {
+            txn.singleDelete(key);
+        } catch (RocksDBException e) {
+            throw new StoreException(e);
+        }
     }
 
     @Override
     public synchronized void update(byte[] key, byte[] value) {
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
-        // TODO Auto-generated method stub
+        try {
+            txn.merge(key, value);
+        } catch (RocksDBException e) {
+            throw new StoreException(e);
+        }
+    }
 
+    private void validateReadOptions() {
+        if (!readOptions.isOwningHandle()) {
+            throw new StoreException("ReadOptions already closed!?");
+        }
     }
 
     private void validateOwned() {
         if (txn == null) {
             throw new StoreException("Tx has already lost ownership");
+        }
+    }
+
+    private void checkInnerKeys(byte[][] keys) {
+        for (int i = 0; i < keys.length; ++i) {
+            if (keys[i] == null) {
+                throw new NullPointerException("keys[" + i + "] cannot be null");
+            }
         }
     }
 }

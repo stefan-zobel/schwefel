@@ -324,7 +324,6 @@ public final class KVStore implements StoreOps {
 
     @Override
     public synchronized ForEachKeyValue scanAll() {
-        // TODO ???
         validateOpen();
         RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
         stats.incOpenCursorsCount();
@@ -334,7 +333,6 @@ public final class KVStore implements StoreOps {
 
     @Override
     public synchronized ForEachKeyValue scanAll(byte[] beginKey) {
-        // TODO ???
         Objects.requireNonNull(beginKey, "beginKey cannot be null");
         validateOpen();
         RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
@@ -345,7 +343,6 @@ public final class KVStore implements StoreOps {
 
     @Override
     public synchronized ForEachKeyValue scanRange(byte[] beginKey, byte[] endKey) {
-        // TODO ???
         Objects.requireNonNull(beginKey, "beginKey cannot be null");
         Objects.requireNonNull(endKey, "endKey cannot be null");
         validateOpen();
@@ -362,7 +359,7 @@ public final class KVStore implements StoreOps {
 
     @Override
     public Tx startTx() {
-        return new Transactional(txnDb.beginTransaction(writeOptions, txnOpts), getStats());
+        return new Transactional(txnDb.beginTransaction(writeOptions, txnOpts), readOptions, getStats());
     }
 
     @Override

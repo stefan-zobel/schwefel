@@ -20,7 +20,6 @@ public interface Tx extends AutoCloseable {
     void commit();
     void rollback();
     void close();
-    // boolean isOpen(); // ???
     void disableIndexing();
     void enableIndexing();
     void setLockTimeout(long lockTimeoutMillis);
