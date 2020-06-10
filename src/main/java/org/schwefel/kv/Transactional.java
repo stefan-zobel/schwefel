@@ -52,13 +52,14 @@ class Transactional implements Tx {
 
     @Override
     public synchronized void rollback() {
-        validateOwned();
-        try {
-            txn.rollback();
-        } catch (RocksDBException e) {
-            throw new StoreException(e);
-        } finally {
-            close();
+        if (txn != null) {
+            try {
+                txn.rollback();
+            } catch (RocksDBException e) {
+                throw new StoreException(e);
+            } finally {
+                close();
+            }
         }
     }
 
