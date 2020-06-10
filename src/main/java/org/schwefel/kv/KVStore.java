@@ -358,7 +358,7 @@ public final class KVStore implements StoreOps {
     }
 
     @Override
-    public Tx startTx() {
+    public synchronized Tx startTx() {
         return new Transactional(txnDb.beginTransaction(writeOptions, txnOpts), readOptions, getStats());
     }
 
