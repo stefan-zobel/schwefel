@@ -3,13 +3,13 @@ package org.schwefel.kv.test;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Paths;
-import java.util.Random;
 
 import org.schwefel.kv.KVStore;
 import org.schwefel.kv.Stats;
 import org.schwefel.kv.StoreOps;
 
 import net.volcanite.util.DoubleStatistics;
+import static org.schwefel.kv.test.TestUtil.randomBytes;
 
 public class KVStorePerfTest {
 
@@ -49,15 +49,6 @@ public class KVStorePerfTest {
                         + ", std: " + round(totalTimeNanos.getStandardDeviation() / 1_000_000.0) + ", min: "
                         + totalTimeNanos.getMin() / 1_000_000.0 + ", max: " + totalTimeNanos.getMax() / 1_000_000.0);
         System.out.println("wal every  : " + round(stats.getAverageWalIntervalMillis()) + " ms");
-    }
-
-    private static final Random rnd = new Random();
-
-    private static final byte[] randomBytes() {
-        int len = rnd.nextInt(400) + 1;
-        byte[] b = new byte[len];
-        rnd.nextBytes(b);
-        return b;
     }
 
     public static double round(double x) {
