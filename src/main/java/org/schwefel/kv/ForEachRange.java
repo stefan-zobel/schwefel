@@ -92,25 +92,6 @@ class ForEachRange extends AbstractForEach {
      *         array is lexicographically greater than the second array
      */
     private static int compare(byte[] a, byte[] b) {
-        if (a == b) {
-            return 0;
-        }
-        if (a == null || b == null) {
-            return a == null ? -1 : 1;
-        }
-        int i = mismatch(a, b, Math.min(a.length, b.length));
-        if (i >= 0) {
-            return Byte.compare(a[i], b[i]);
-        }
-        return a.length - b.length;
-    }
-
-    private static int mismatch(byte[] a, byte[] b, int length) {
-        for (int i = 0; i < length; ++i) {
-            if (a[i] != b[i]) {
-                return i;
-            }
-        }
-        return -1;
+        return LexicographicByteArrayComparator.lexicographicalCompare(a, b);
     }
 }
