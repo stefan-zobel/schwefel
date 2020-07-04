@@ -4534,5 +4534,6 @@ public class RocksDB extends RocksObject {
   private native static void destroyDB(final String path,
       final long optionsHandle) throws RocksDBException;
 
+  @SuppressWarnings("rawtypes")
   protected DBOptionsInterface options_;
 }
