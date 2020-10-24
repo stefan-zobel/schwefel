@@ -4,14 +4,14 @@
 	<groupId>net.sourceforge.streamsupport</groupId>
 	<artifactId>schwefel</artifactId>
 	<packaging>jar</packaging>
-	<version>6.11.4.0</version>
+	<version>6.13.3.0</version>
 	<name>schwefel</name>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.rocksdb</groupId>
 			<artifactId>rocksdbjni</artifactId>
-			<version>6.11.4</version>
+			<version>6.13.3</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -32,7 +32,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.1.0</version>
+				<version>3.2.0</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
