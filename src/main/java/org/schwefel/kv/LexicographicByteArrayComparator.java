@@ -17,6 +17,9 @@ package org.schwefel.kv;
 
 import java.util.Comparator;
 
+/**
+ * Unsigned lexicographical byte array comparison. 
+ */
 public class LexicographicByteArrayComparator implements Comparator<byte[]> {
 
     public static final LexicographicByteArrayComparator COMPARATOR = new LexicographicByteArrayComparator();
@@ -51,7 +54,7 @@ public class LexicographicByteArrayComparator implements Comparator<byte[]> {
         }
         int i = mismatch(a, b, Math.min(a.length, b.length));
         if (i >= 0) {
-            return Byte.compare(a[i], b[i]);
+            return unsignedCompare(a[i], b[i]);
         }
         return a.length - b.length;
     }
@@ -63,5 +66,9 @@ public class LexicographicByteArrayComparator implements Comparator<byte[]> {
             }
         }
         return -1;
+    }
+
+    private static int unsignedCompare(byte x, byte y) {
+        return (x & 0xff) - (y & 0xff);
     }
 }
