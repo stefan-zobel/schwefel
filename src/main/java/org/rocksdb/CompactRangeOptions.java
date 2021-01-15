@@ -21,7 +21,7 @@ public class CompactRangeOptions extends RocksObject {
     /**
      * Skip bottommost level compaction
      */
-    kSkip((byte)VALUE_kSkip),
+    kSkip(VALUE_kSkip),
     /**
      * Only compact bottommost level if there is a compaction filter. This is the default option
      */
