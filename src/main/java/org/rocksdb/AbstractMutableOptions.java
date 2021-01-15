@@ -250,6 +250,8 @@ public abstract class AbstractMutableOptions {
 
         case ENUM:
           // fall through
+        default:
+          // fall through
       }
 
       throw new IllegalStateException(
