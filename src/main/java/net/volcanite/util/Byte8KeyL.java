@@ -32,7 +32,7 @@ public final class Byte8KeyL {
     }
 
     /**
-     * Construct a {@code Byte8Key} from a little endian byte array key.
+     * Construct a {@code Byte8KeyL} from a little endian byte array key.
      * 
      * @param key
      *            array in little endian representation

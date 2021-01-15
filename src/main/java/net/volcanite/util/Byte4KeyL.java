@@ -32,7 +32,7 @@ public final class Byte4KeyL {
     }
 
     /**
-     * Construct a {@code Byte4Key} from a little endian byte array key.
+     * Construct a {@code Byte4KeyL} from a little endian byte array key.
      * 
      * @param key
      *            array in little endian representation
