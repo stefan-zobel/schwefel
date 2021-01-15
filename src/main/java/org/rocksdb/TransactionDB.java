@@ -288,7 +288,7 @@ public class TransactionDB extends RocksDB
    *
    * @return The waiting transactions
    */
-  private DeadlockInfo newDeadlockInfo(
+  private static DeadlockInfo newDeadlockInfo(
       final long transactionID, final long columnFamilyId,
       final String waitingKey, final boolean exclusive) {
     return new DeadlockInfo(transactionID, columnFamilyId,

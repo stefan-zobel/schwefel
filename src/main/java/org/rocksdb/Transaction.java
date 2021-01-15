@@ -1835,7 +1835,7 @@ public class Transaction extends RocksObject {
    *
    * @return The waiting transactions
    */
-  private WaitingTransactions newWaitingTransactions(
+  private static WaitingTransactions newWaitingTransactions(
       final long columnFamilyId, final String key,
       final long[] transactionIds) {
     return new WaitingTransactions(columnFamilyId, key, transactionIds);

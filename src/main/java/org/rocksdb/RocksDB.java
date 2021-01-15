@@ -4419,7 +4419,7 @@ public class RocksDB extends RocksObject {
     destroyDB(path, options.nativeHandle_);
   }
 
-  private /* @Nullable */ long[] toNativeHandleList(
+  private static /* @Nullable */ long[] toNativeHandleList(
       /* @Nullable */ final List<? extends RocksObject> objectList) {
     if (objectList == null) {
       return null;

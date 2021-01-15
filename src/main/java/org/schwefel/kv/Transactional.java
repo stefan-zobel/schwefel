@@ -211,7 +211,7 @@ class Transactional implements Tx {
         }
     }
 
-    private void checkInnerKeys(byte[][] keys) {
+    private static void checkInnerKeys(byte[][] keys) {
         for (int i = 0; i < keys.length; ++i) {
             if (keys[i] == null) {
                 throw new NullPointerException("keys[" + i + "] cannot be null");
