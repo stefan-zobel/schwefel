@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, 2021 Stefan Zobel
+ * Copyright 2021 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,10 @@
  */
 package org.schwefel.kv;
 
-public interface StoreOps extends BasicOps, AutoCloseable {
+public interface BasicOps {
 
-    void close();
     void put(byte[] key, byte[] value);
-    void putIfAbsent(byte[] key, byte[] value);
     byte[] get(byte[] key);
     void delete(byte[] key);
-    void deleteRange(byte[] beginKey, byte[] endKey);
     void update(byte[] key, byte[] value);
-    Batch createBatch();
-    void writeBatch(Batch batch);
-    ForEachKeyValue scanAll();
-    ForEachKeyValue scanAll(byte[] beginKey);
-    ForEachKeyValue scanRange(byte[] beginKey, byte[] endKey);
-    Tx startTx();
-    void syncWAL();
-    boolean isOpen();
-    void flush();
-    void flushNoWait();
-    Stats getStats();
 }
