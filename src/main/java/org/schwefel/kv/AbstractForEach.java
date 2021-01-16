@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Stefan Zobel
+ * Copyright 2020, 2021 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,21 +23,26 @@ import org.rocksdb.RocksIterator;
 abstract class AbstractForEach implements ForEachKeyValue {
 
     volatile RocksIterator iter;
+    private volatile BasicOps ops;
     private final Stats stats;
 
-    AbstractForEach(RocksIterator iter, Stats stats) {
+    AbstractForEach(RocksIterator iter, Stats stats, BasicOps ops) {
         this.iter = Objects.requireNonNull(iter);
+        this.ops = ops;
         this.stats = stats;
     }
 
     @Override
     public void close() {
-        if (isOpen() && iter.isOwningHandle()) {
+        if (isOpen()) {
             try {
-                iter.close();
-                stats.decOpenCursorsCount();
+                if (iter.isOwningHandle()) {
+                    iter.close();
+                    stats.decOpenCursorsCount();
+                }
             } finally {
                 iter = null;
+                ops = null;
             }
         }
     }
@@ -47,6 +52,11 @@ abstract class AbstractForEach implements ForEachKeyValue {
 
     @Override
     public abstract boolean tryAdvance(BiConsumer<byte[], byte[]> action);
+
+    @Override
+    public BasicOps ops() {
+        return ops;
+    }
 
     private boolean isOpen() {
         return iter != null;

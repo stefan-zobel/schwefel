@@ -24,4 +24,6 @@ public interface ForEachKeyValue extends AutoCloseable {
     boolean tryAdvance(BiConsumer<byte[], byte[]> action);
 
     void close();
+
+    BasicOps ops();
 }

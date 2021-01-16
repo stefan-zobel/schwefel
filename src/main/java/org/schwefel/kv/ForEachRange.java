@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Stefan Zobel
+ * Copyright 2020, 2021 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ class ForEachRange extends AbstractForEach {
 
     private final byte[] endExclusive;
 
-    ForEachRange(RocksIterator iter, byte[] endKey, Stats stats) {
-        super(iter, stats);
+    ForEachRange(RocksIterator iter, byte[] endKey, Stats stats, BasicOps ops) {
+        super(iter, stats, ops);
         this.endExclusive = Objects.requireNonNull(endKey, "endKey cannot be null");
     }
 

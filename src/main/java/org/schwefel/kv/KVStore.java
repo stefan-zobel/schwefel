@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Stefan Zobel
+ * Copyright 2020, 2021 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -328,7 +328,7 @@ public final class KVStore implements StoreOps {
         RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
         stats.incOpenCursorsCount();
         it.seekToFirst();
-        return new ForEachAll(it, stats);
+        return new ForEachAll(it, stats, this);
     }
 
     @Override
@@ -338,7 +338,7 @@ public final class KVStore implements StoreOps {
         RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
         stats.incOpenCursorsCount();
         it.seek(beginKey);
-        return new ForEachAll(it, stats);
+        return new ForEachAll(it, stats, this);
     }
 
     @Override
@@ -349,7 +349,7 @@ public final class KVStore implements StoreOps {
         RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
         stats.incOpenCursorsCount();
         it.seek(beginKey);
-        return new ForEachRange(it, endKey, stats);
+        return new ForEachRange(it, endKey, stats, this);
     }
 
     @Override

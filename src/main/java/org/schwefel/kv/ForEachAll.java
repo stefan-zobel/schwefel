@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Stefan Zobel
+ * Copyright 2020, 2021 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ class ForEachAll extends AbstractForEach {
 
     private static final Logger logger = Logger.getLogger(ForEachAll.class.getName());
 
-    ForEachAll(RocksIterator iter, Stats stats) {
-        super(iter, stats);
+    ForEachAll(RocksIterator iter, Stats stats, BasicOps ops) {
+        super(iter, stats, ops);
     }
 
     @Override
