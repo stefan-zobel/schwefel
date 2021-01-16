@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 
 import org.rocksdb.RocksIterator;
 
-// TODO: not sure if this overcautious early closing approach is a good idea
 class ForEachRange extends AbstractForEach {
 
     private static final Logger logger = Logger.getLogger(ForEachRange.class.getName());

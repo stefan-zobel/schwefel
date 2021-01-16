@@ -37,24 +37,14 @@ public class ScanTest {
                 store.put(key, values.get(i));
             }
 
-            ForEachKeyValue kv = null;
-            try {
-                // retrieve in key order (= reversed storage order)
-                kv = store.scanAll(Byte4Key.minKey());
+            // retrieve in key order (= reversed storage order)
+            try (ForEachKeyValue kv = store.scanAll(Byte4Key.minKey())) {
                 kv.forEachRemaining(new BiConsumer<byte[], byte[]>() {
                     @Override
                     public void accept(byte[] key, byte[] value) {
                         System.out.println(new String(value) + " / " + Arrays.toString(key));
                     }
                 });
-            } finally {
-                try {
-                    if (kv != null) {
-                        kv.close();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             }
         }
     }
