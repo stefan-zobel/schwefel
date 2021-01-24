@@ -25,6 +25,7 @@ public interface StoreOps extends BasicOps, AutoCloseable {
     byte[] deleteIfPresent(byte[] key);
     void deleteRange(byte[] beginKey, byte[] endKey);
     void update(byte[] key, byte[] value);
+    byte[] updateIfPresent(byte[] key, byte[] value);
     Batch createBatch();
     void writeBatch(Batch batch);
     ForEachKeyValue scanAll();
