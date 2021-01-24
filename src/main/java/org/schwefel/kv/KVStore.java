@@ -163,9 +163,9 @@ public final class KVStore implements StoreOps {
         long start = System.nanoTime();
         Objects.requireNonNull(key, "key cannot be null");
         validateOpen();
-        byte[] value = null;
+        byte[] oldVal = null;
         try {
-            if ((value = get_(key)) != null) {
+            if ((oldVal = get_(key)) != null) {
                 delete_(key);
             }
         } catch (RocksDBException e) {
@@ -173,7 +173,7 @@ public final class KVStore implements StoreOps {
         } finally {
             stats.allOpsTimeNanos.accept(System.nanoTime() - start);
         }
-        return value;
+        return oldVal;
     }
 
     @Override

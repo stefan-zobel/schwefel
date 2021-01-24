@@ -24,6 +24,7 @@ public interface Tx extends BasicOps, AutoCloseable {
     void enableIndexing();
     void setLockTimeout(long lockTimeoutMillis);
     void put(byte[] key, byte[] value);
+    void putIfAbsent(byte[] key, byte[] value);
     byte[] get(byte[] key);
     byte[][] multiGet(byte[][] keys);
     byte[] getForUpdate(byte[] key);
@@ -31,6 +32,8 @@ public interface Tx extends BasicOps, AutoCloseable {
     byte[][] multiGetForUpdate(byte[][] keys);
     void undoGetForUpdate(byte[] key);
     void delete(byte[] key);
+    byte[] deleteIfPresent(byte[] key);
     void singleDelete(byte[] key);
     void update(byte[] key, byte[] value);
+    byte[] updateIfPresent(byte[] key, byte[] value);
 }

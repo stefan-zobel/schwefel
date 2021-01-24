@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Stefan Zobel
+ * Copyright 2020, 2021 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,6 +105,19 @@ class Transactional implements Tx {
     }
 
     @Override
+    public synchronized void putIfAbsent(byte[] key, byte[] value) {
+        Objects.requireNonNull(key, "key cannot be null");
+        validateOwned();
+        try {
+            if (get(key) == null) {
+                txn.put(key, value);
+            }
+        } catch (RocksDBException e) {
+            throw new StoreException(e);
+        }
+    }
+
+    @Override
     public synchronized byte[] get(byte[] key) {
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
@@ -178,6 +191,21 @@ class Transactional implements Tx {
     }
 
     @Override
+    public synchronized byte[] deleteIfPresent(byte[] key) {
+        Objects.requireNonNull(key, "key cannot be null");
+        validateOwned();
+        byte[] oldVal = null;
+        try {
+            if ((oldVal = get(key)) != null) {
+                txn.delete(key);
+            }
+        } catch (RocksDBException e) {
+            throw new StoreException(e);
+        }
+        return oldVal;
+    }
+
+    @Override
     public synchronized void singleDelete(byte[] key) {
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
@@ -197,6 +225,21 @@ class Transactional implements Tx {
         } catch (RocksDBException e) {
             throw new StoreException(e);
         }
+    }
+
+    @Override
+    public synchronized byte[] updateIfPresent(byte[] key, byte[] value) {
+        Objects.requireNonNull(key, "key cannot be null");
+        validateOwned();
+        byte[] oldVal = null;
+        try {
+            if ((oldVal = get(key)) != null) {
+                txn.merge(key, value);
+            }
+        } catch (RocksDBException e) {
+            throw new StoreException(e);
+        }
+        return oldVal;
     }
 
     private void validateReadOptions() {
