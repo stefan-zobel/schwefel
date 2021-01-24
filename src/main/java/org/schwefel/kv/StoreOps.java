@@ -22,6 +22,7 @@ public interface StoreOps extends BasicOps, AutoCloseable {
     void putIfAbsent(byte[] key, byte[] value);
     byte[] get(byte[] key);
     void delete(byte[] key);
+    byte[] deleteIfPresent(byte[] key);
     void deleteRange(byte[] beginKey, byte[] endKey);
     void update(byte[] key, byte[] value);
     Batch createBatch();

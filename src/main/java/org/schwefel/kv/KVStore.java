@@ -159,6 +159,24 @@ public final class KVStore implements StoreOps {
     }
 
     @Override
+    public synchronized byte[] deleteIfPresent(byte[] key) {
+        long start = System.nanoTime();
+        Objects.requireNonNull(key, "key cannot be null");
+        validateOpen();
+        byte[] value = null;
+        try {
+            if ((value = get_(key)) != null) {
+                delete_(key);
+            }
+        } catch (RocksDBException e) {
+            throw new StoreException(e);
+        } finally {
+            stats.allOpsTimeNanos.accept(System.nanoTime() - start);
+        }
+        return value;
+    }
+
+    @Override
     public synchronized byte[] get(byte[] key) {
         long start = System.nanoTime();
         Objects.requireNonNull(key, "key cannot be null");
