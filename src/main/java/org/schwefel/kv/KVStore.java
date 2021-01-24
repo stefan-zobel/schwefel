@@ -33,6 +33,8 @@ import org.rocksdb.TransactionOptions;
 import org.rocksdb.WriteBatch;
 import org.rocksdb.WriteOptions;
 
+import static org.schwefel.kv.LexicographicByteArrayComparator.lexicographicalCompare;
+
 public final class KVStore implements StoreOps {
 
     private static final long FLUSH_TIME_WINDOW_MILLIS = 985L;
@@ -386,6 +388,19 @@ public final class KVStore implements StoreOps {
         stats.incOpenCursorsCount();
         it.seek(beginKey);
         return new ForEachRange(it, endKey, stats, this);
+    }
+
+    @Override
+    public synchronized byte[] findMinKeyGreaterThan(byte[] keyPrefix, byte[] lowerBound) {
+        Objects.requireNonNull(keyPrefix, "keyPrefix cannot be null");
+        Objects.requireNonNull(lowerBound, "lowerBound cannot be null");
+        validateOpen();
+        if (keyPrefix.length >= lowerBound.length && lexicographicalCompare(keyPrefix, lowerBound) < 0) {
+            return null;
+        }
+        RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
+        stats.incOpenCursorsCount();
+        return MinMaxKeyIt.findMinKeyGreaterThan(it, stats, keyPrefix, lowerBound);
     }
 
     @Override
