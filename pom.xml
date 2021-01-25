@@ -8,12 +8,14 @@
 	<name>schwefel</name>
 
 	<dependencies>
+	<!--
 		<dependency>
 			<groupId>org.rocksdb</groupId>
 			<artifactId>rocksdbjni</artifactId>
 			<version>6.15.2</version>
 			<scope>test</scope>
 		</dependency>
+	-->
 	</dependencies>
 
 	<properties>
