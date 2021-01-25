@@ -36,6 +36,9 @@ public interface Tx extends BasicOps, AutoCloseable {
     void singleDelete(byte[] key);
     void update(byte[] key, byte[] value);
     byte[] updateIfPresent(byte[] key, byte[] value);
+    ForEachKeyValue scanAll();
+    ForEachKeyValue scanAll(byte[] beginKey);
+    ForEachKeyValue scanRange(byte[] beginKey, byte[] endKey);
     byte[] findMaxKeyLessThan(byte[] keyPrefix, byte[] upperBound);
     byte[] findMinKeyGreaterThan(byte[] keyPrefix, byte[] lowerBound);
 }
