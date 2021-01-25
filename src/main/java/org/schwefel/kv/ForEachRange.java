@@ -48,7 +48,7 @@ class ForEachRange extends AbstractForEach {
                 }
             }
         } catch (RuntimeException e) {
-            logger.log(Level.WARNING, "closing ForEachAll", e);
+            logger.log(Level.WARNING, "closing ForEachRange", e);
             throw e;
         } finally {
             close();
