@@ -19,13 +19,34 @@ import org.rocksdb.RocksIterator;
 
 import static org.schwefel.kv.LexicographicByteArrayComparator.lexicographicalCompare;
 
+/*
+ * TODO: use the ByteBuffer Iterator methods instead of the byte[] array methods
+ */
 final class MinMaxKeyIt {
 
-    public static void main(String[] args) {
-
-        // prefix(key) >= keyPrefix
-
-        // prefix(key) < keyPrefix
+    static byte[] findMaxKeyLessThan(RocksIterator iter, Stats stats, byte[] keyPrefix, byte[] upperBound) {
+        try {
+            if (iter.isOwningHandle()) {
+                iter.seekForPrev(upperBound);
+                byte[] key = null;
+                if (iter.isValid() && (key = iter.key()) != null && lexicographicalCompare(key, upperBound) == 0) {
+                    iter.prev();
+                }
+                while (iter.isValid() && (key = iter.key()) != null
+                        && prefixOfKeyOtherThanKeyPrefix(key, keyPrefix, GREATER)) {
+                    iter.prev();
+                }
+                if (keyStartsWithPrefix(key, keyPrefix) && lexicographicalCompare(key, upperBound) < 0) {
+                    return key;
+                }
+            }
+            return null;
+        } finally {
+            if (iter.isOwningHandle()) {
+                iter.close();
+                stats.decOpenCursorsCount();
+            }
+        }
     }
 
     static byte[] findMinKeyGreaterThan(RocksIterator iter, Stats stats, byte[] keyPrefix, byte[] lowerBound) {
@@ -36,7 +57,8 @@ final class MinMaxKeyIt {
                 if (iter.isValid() && (key = iter.key()) != null && lexicographicalCompare(key, lowerBound) == 0) {
                     iter.next();
                 }
-                while (iter.isValid() && (key = iter.key()) != null && prefixOfKeyLessThanKeyPrefix(key, keyPrefix)) {
+                while (iter.isValid() && (key = iter.key()) != null
+                        && prefixOfKeyOtherThanKeyPrefix(key, keyPrefix, LESS)) {
                     iter.next();
                 }
                 if (keyStartsWithPrefix(key, keyPrefix) && lexicographicalCompare(key, lowerBound) > 0) {
@@ -52,14 +74,14 @@ final class MinMaxKeyIt {
         }
     }
 
-    private static boolean prefixOfKeyLessThanKeyPrefix(byte[] key, byte[] keyPrefix) {
+    private static boolean prefixOfKeyOtherThanKeyPrefix(byte[] key, byte[] keyPrefix, BytePredicate comparator) {
         if (key == null || keyPrefix == null) {
             return false;
         }
         int len = Math.min(key.length, keyPrefix.length);
         for (int i = 0; i < len; ++i) {
             if (key[i] != keyPrefix[i]) {
-                return ((key[i] & 0xff) - (keyPrefix[i] & 0xff)) < 0;
+                return comparator.test(key[i], keyPrefix[i]);
             }
         }
         return false;
@@ -78,5 +100,23 @@ final class MinMaxKeyIt {
             }
         }
         return true;
+    }
+
+    private static final BytePredicate GREATER = new BytePredicate() {
+        @Override
+        public boolean test(byte keyByte, byte prefixByte) {
+            return ((keyByte & 0xff) - (prefixByte & 0xff)) > 0;
+        }
+    };
+
+    private static final BytePredicate LESS = new BytePredicate() {
+        @Override
+        public boolean test(byte keyByte, byte prefixByte) {
+            return ((keyByte & 0xff) - (prefixByte & 0xff)) < 0;
+        }
+    };
+
+    private static interface BytePredicate {
+        boolean test(byte keyByte, byte prefixByte);
     }
 }

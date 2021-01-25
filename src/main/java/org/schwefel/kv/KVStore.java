@@ -391,6 +391,19 @@ public final class KVStore implements StoreOps {
     }
 
     @Override
+    public synchronized byte[] findMaxKeyLessThan(byte[] keyPrefix, byte[] upperBound) {
+        Objects.requireNonNull(keyPrefix, "keyPrefix cannot be null");
+        Objects.requireNonNull(upperBound, "upperBound cannot be null");
+        validateOpen();
+        if (keyPrefix.length >= upperBound.length && lexicographicalCompare(keyPrefix, upperBound) > 0) {
+            return null;
+        }
+        RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
+        stats.incOpenCursorsCount();
+        return MinMaxKeyIt.findMaxKeyLessThan(it, stats, keyPrefix, upperBound);
+    }
+
+    @Override
     public synchronized byte[] findMinKeyGreaterThan(byte[] keyPrefix, byte[] lowerBound) {
         Objects.requireNonNull(keyPrefix, "keyPrefix cannot be null");
         Objects.requireNonNull(lowerBound, "lowerBound cannot be null");
