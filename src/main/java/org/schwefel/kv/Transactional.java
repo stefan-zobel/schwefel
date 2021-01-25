@@ -19,7 +19,10 @@ import java.util.Objects;
 
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDBException;
+import org.rocksdb.RocksIterator;
 import org.rocksdb.Transaction;
+
+import static org.schwefel.kv.LexicographicByteArrayComparator.lexicographicalCompare;
 
 class Transactional implements Tx {
 
@@ -140,6 +143,34 @@ class Transactional implements Tx {
         } catch (RocksDBException e) {
             throw new StoreException(e);
         }
+    }
+
+    @Override
+    public synchronized byte[] findMaxKeyLessThan(byte[] keyPrefix, byte[] upperBound) {
+        Objects.requireNonNull(keyPrefix, "keyPrefix cannot be null");
+        Objects.requireNonNull(upperBound, "upperBound cannot be null");
+        validateOwned();
+        validateReadOptions();
+        if (keyPrefix.length >= upperBound.length && lexicographicalCompare(keyPrefix, upperBound) > 0) {
+            return null;
+        }
+        RocksIterator it = Objects.requireNonNull(txn.getIterator(readOptions));
+        stats.incOpenCursorsCount();
+        return MinMaxKeyIt.findMaxKeyLessThan(it, stats, keyPrefix, upperBound);
+    }
+
+    @Override
+    public synchronized byte[] findMinKeyGreaterThan(byte[] keyPrefix, byte[] lowerBound) {
+        Objects.requireNonNull(keyPrefix, "keyPrefix cannot be null");
+        Objects.requireNonNull(lowerBound, "lowerBound cannot be null");
+        validateOwned();
+        validateReadOptions();
+        if (keyPrefix.length >= lowerBound.length && lexicographicalCompare(keyPrefix, lowerBound) < 0) {
+            return null;
+        }
+        RocksIterator it = Objects.requireNonNull(txn.getIterator(readOptions));
+        stats.incOpenCursorsCount();
+        return MinMaxKeyIt.findMinKeyGreaterThan(it, stats, keyPrefix, lowerBound);
     }
 
     @Override
