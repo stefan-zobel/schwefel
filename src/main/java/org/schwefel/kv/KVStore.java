@@ -186,7 +186,7 @@ public final class KVStore implements StoreOps {
         byte[] oldVal = null;
         try {
             if ((oldVal = get_(key)) != null) {
-                update_(key, value);
+                put_(key, value);
             }
         } catch (RocksDBException e) {
             throw new StoreException(e);
@@ -263,26 +263,7 @@ public final class KVStore implements StoreOps {
 
     @Override
     public synchronized void update(byte[] key, byte[] value) {
-        long start = System.nanoTime();
-        Objects.requireNonNull(key, "key cannot be null");
-        validateOpen();
-        try {
-            update_(key, value);
-        } catch (RocksDBException e) {
-            throw new StoreException(e);
-        } finally {
-            stats.allOpsTimeNanos.accept(System.nanoTime() - start);
-        }
-    }
-
-    private void update_(byte[] key, byte[] value) throws RocksDBException {
-        long updStart = System.nanoTime();
-        try (Transaction txn = txnDb.beginTransaction(writeOptions, txnOpts)) {
-            txn.merge(key, value);
-            txn.commit();
-            stats.mergeTimeNanos.accept(System.nanoTime() - updStart);
-            occasionalWalSync();
-        }
+        put(key, value);
     }
 
     @Override

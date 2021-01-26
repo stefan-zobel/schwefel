@@ -282,13 +282,7 @@ class Transactional implements Tx {
 
     @Override
     public synchronized void update(byte[] key, byte[] value) {
-        Objects.requireNonNull(key, "key cannot be null");
-        validateOwned();
-        try {
-            txn.merge(key, value);
-        } catch (RocksDBException e) {
-            throw new StoreException(e);
-        }
+        put(key, value);
     }
 
     @Override
@@ -298,7 +292,7 @@ class Transactional implements Tx {
         byte[] oldVal = null;
         try {
             if ((oldVal = get(key)) != null) {
-                txn.merge(key, value);
+                txn.put(key, value);
             }
         } catch (RocksDBException e) {
             throw new StoreException(e);
