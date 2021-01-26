@@ -281,11 +281,6 @@ class Transactional implements Tx {
     }
 
     @Override
-    public synchronized void update(byte[] key, byte[] value) {
-        put(key, value);
-    }
-
-    @Override
     public synchronized byte[] updateIfPresent(byte[] key, byte[] value) {
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();

@@ -262,11 +262,6 @@ public final class KVStore implements StoreOps {
     }
 
     @Override
-    public synchronized void update(byte[] key, byte[] value) {
-        put(key, value);
-    }
-
-    @Override
     public synchronized void writeBatch(Batch batch) {
         long start = System.nanoTime();
         Objects.requireNonNull(batch, "batch cannot be null");

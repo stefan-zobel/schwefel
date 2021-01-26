@@ -20,5 +20,5 @@ public interface BasicOps {
     void put(byte[] key, byte[] value);
     byte[] get(byte[] key);
     void delete(byte[] key);
-    void update(byte[] key, byte[] value);
+    byte[] updateIfPresent(byte[] key, byte[] value);
 }
