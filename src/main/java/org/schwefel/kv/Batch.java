@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Stefan Zobel
+ * Copyright 2020, 2021 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,5 +20,5 @@ public interface Batch extends AutoCloseable {
     void put(byte[] key, byte[] value);
     void delete(byte[] key);
     void deleteRange(byte[] beginKey, byte[] endKey);
-    void update(byte[] key, byte[] value);
+    void singleDelete(byte[] key);
 }

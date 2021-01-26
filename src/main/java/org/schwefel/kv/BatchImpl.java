@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Stefan Zobel
+ * Copyright 2020, 2021 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,11 +63,11 @@ class BatchImpl implements Batch, AutoCloseable {
     }
 
     @Override
-    public synchronized void update(byte[] key, byte[] value) {
+    public synchronized void singleDelete(byte[] key) {
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
         try {
-            batch.merge(key, value);
+            batch.singleDelete(key);
         } catch (RocksDBException e) {
             throw new StoreException(e);
         }
