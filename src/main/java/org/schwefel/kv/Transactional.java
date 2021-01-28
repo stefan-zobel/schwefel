@@ -189,6 +189,16 @@ class Transactional implements Tx {
     }
 
     @Override
+    public synchronized byte[] findMaxKey(byte[] keyPrefix) {
+        Objects.requireNonNull(keyPrefix, "keyPrefix cannot be null");
+        validateOwned();
+        validateReadOptions();
+        RocksIterator it = Objects.requireNonNull(txn.getIterator(readOptions));
+        stats.incOpenCursorsCount();
+        return MinMaxKeyIt.findMaxKey(it, stats, keyPrefix);
+    }
+
+    @Override
     public synchronized byte[] findMaxKeyLessThan(byte[] keyPrefix, byte[] upperBound) {
         Objects.requireNonNull(keyPrefix, "keyPrefix cannot be null");
         Objects.requireNonNull(upperBound, "upperBound cannot be null");

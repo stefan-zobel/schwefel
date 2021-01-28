@@ -31,6 +31,7 @@ public interface StoreOps extends BasicOps, AutoCloseable {
     ForEachKeyValue scanAll(byte[] beginKey);
     ForEachKeyValue scanRange(byte[] beginKey, byte[] endKey);
     byte[] findMinKey(byte[] keyPrefix);
+    byte[] findMaxKey(byte[] keyPrefix);
     byte[] findMaxKeyLessThan(byte[] keyPrefix, byte[] upperBound);
     byte[] findMinKeyGreaterThan(byte[] keyPrefix, byte[] lowerBound);
     Tx startTx();

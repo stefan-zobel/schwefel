@@ -94,6 +94,29 @@ final class MinMaxKeyIt {
         }
     }
 
+    static byte[] findMaxKey(RocksIterator iter, Stats stats, byte[] keyPrefix) {
+        try {
+            if (iter.isOwningHandle()) {
+                iter.seek(keyPrefix);
+                byte[] key = null;
+                byte[] max = null;
+                while (iter.isValid() && (key = iter.key()) != null && keyStartsWithPrefix(key, keyPrefix)) {
+                    max = key;
+                    iter.next();
+                }
+                if (keyStartsWithPrefix(max, keyPrefix)) {
+                    return max;
+                }
+            }
+            return null;
+        } finally {
+            if (iter.isOwningHandle()) {
+                iter.close();
+                stats.decOpenCursorsCount();
+            }
+        }
+    }
+
     private static boolean prefixOfKeyOtherThanKeyPrefix(byte[] key, byte[] keyPrefix, BytePredicate comparator) {
         if (key == null || keyPrefix == null) {
             return false;
