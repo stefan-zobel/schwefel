@@ -6,21 +6,33 @@
 	<packaging>jar</packaging>
 	<version>6.15.2.1</version>
 	<name>schwefel</name>
+    <description>A dead simple RocksDB Java wrapper</description>
+    <url>https://github.com/stefan-zobel/schwefel/</url>
 
-	<dependencies>
-	<!--
-		<dependency>
-			<groupId>org.rocksdb</groupId>
-			<artifactId>rocksdbjni</artifactId>
-			<version>6.15.2</version>
-			<scope>test</scope>
-		</dependency>
-	-->
-	</dependencies>
+    <licenses>
+        <license>
+			<name>Apache License, version 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Stefan Zobel</name>
+            <email>Spliterator@gmail.com</email>
+            <organization>net.sourceforge.streamsupport</organization>
+            <organizationUrl>https://github.com/stefan-zobel/</organizationUrl>
+        </developer>
+    </developers>
+    <scm>
+        <url>https://github.com/stefan-zobel/schwefel</url>
+        <connection>scm:git:https://github.com/stefan-zobel/schwefel.git</connection>
+        <developerConnection>scm:git:https://github.com/stefan-zobel/schwefel.git</developerConnection>
+    </scm>
 
 	<properties>
 		<project.build.sourceEncoding>Cp1252</project.build.sourceEncoding>
 	</properties>
+
 	<build>
 		<plugins>
 			<plugin>
