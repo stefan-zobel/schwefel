@@ -4,3 +4,10 @@
 # schwefel
 
 A dead simple RocksDB Java wrapper
+
+
+Status:
+
+* Mostly undocumented; not thoroughly tested
+* Only suited for adventurous developers
+
