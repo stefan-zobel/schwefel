@@ -32,10 +32,16 @@ class ForEachAll extends AbstractForEach {
 
     @Override
     public synchronized void forEachRemaining(BiConsumer<byte[], byte[]> action) {
+        forEachUntilLimit(action, Long.MAX_VALUE);
+    }
+
+    @Override
+    public synchronized void forEachUntilLimit(BiConsumer<byte[], byte[]> action, long limit) {
         Objects.requireNonNull(action, "action cannot be null");
         checkOpen();
         try {
-            while (iter.isValid()) {
+            long count = 0L;
+            while (iter.isValid() && count++ < limit) {
                 action.accept(iter.key(), iter.value());
                 iter.next();
             }

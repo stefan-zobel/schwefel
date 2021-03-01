@@ -51,6 +51,9 @@ abstract class AbstractForEach implements ForEachKeyValue {
     public abstract void forEachRemaining(BiConsumer<byte[], byte[]> action);
 
     @Override
+    public abstract void forEachUntilLimit(BiConsumer<byte[], byte[]> action, long limit);
+
+    @Override
     public abstract boolean tryAdvance(BiConsumer<byte[], byte[]> action);
 
     @Override

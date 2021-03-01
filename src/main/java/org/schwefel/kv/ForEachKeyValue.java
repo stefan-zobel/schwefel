@@ -21,6 +21,8 @@ public interface ForEachKeyValue extends AutoCloseable {
 
     void forEachRemaining(BiConsumer<byte[], byte[]> action);
 
+    void forEachUntilLimit(BiConsumer<byte[], byte[]> action, long limit);
+
     boolean tryAdvance(BiConsumer<byte[], byte[]> action);
 
     void close();
