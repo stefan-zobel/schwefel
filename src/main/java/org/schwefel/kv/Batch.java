@@ -19,6 +19,5 @@ public interface Batch extends AutoCloseable {
 
     void put(byte[] key, byte[] value);
     void delete(byte[] key);
-    void deleteRange(byte[] beginKey, byte[] endKey);
     void singleDelete(byte[] key);
 }

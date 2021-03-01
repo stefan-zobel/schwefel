@@ -244,24 +244,6 @@ public final class KVStore implements StoreOps {
     }
 
     @Override
-    public synchronized void deleteRange(byte[] beginKey, byte[] endKey) {
-        long start = System.nanoTime();
-        Objects.requireNonNull(beginKey, "beginKey cannot be null");
-        Objects.requireNonNull(endKey, "endKey cannot be null");
-        validateOpen();
-        try {
-            txnDb.deleteRange(writeOptions, beginKey, endKey);
-        } catch (RocksDBException e) {
-            throw new StoreException(e);
-        } finally {
-            long delta = System.nanoTime() - start;
-            stats.allOpsTimeNanos.accept(delta);
-            stats.deleteTimeNanos.accept(delta);
-            occasionalWalSync();
-        }
-    }
-
-    @Override
     public synchronized void writeBatch(Batch batch) {
         long start = System.nanoTime();
         Objects.requireNonNull(batch, "batch cannot be null");

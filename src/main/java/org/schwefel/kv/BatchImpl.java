@@ -51,18 +51,6 @@ class BatchImpl implements Batch, AutoCloseable {
     }
 
     @Override
-    public synchronized void deleteRange(byte[] beginKey, byte[] endKey) {
-        Objects.requireNonNull(beginKey, "beginKey cannot be null");
-        Objects.requireNonNull(endKey, "endKey cannot be null");
-        validateOwned();
-        try {
-            batch.deleteRange(beginKey, endKey);
-        } catch (RocksDBException e) {
-            throw new StoreException(e);
-        }
-    }
-
-    @Override
     public synchronized void singleDelete(byte[] key) {
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
