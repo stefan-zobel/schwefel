@@ -92,9 +92,7 @@ public final class KVStore implements StoreOps {
     }
 
     private TransactionDB openDatabase() throws RocksDBException {
-        Options opts = null;
-        try {
-            opts = new Options(options, columnFamilyOptions);
+        try (Options opts = new Options(options, columnFamilyOptions)) {
             List<byte[]> families = RocksDB.listColumnFamilies(opts, path);
             List<ColumnFamilyDescriptor> cfDescs = new ArrayList<ColumnFamilyDescriptor>();
             for (byte[] cfName : families) {
@@ -105,10 +103,6 @@ public final class KVStore implements StoreOps {
                         columnFamilyOptions));
             }
             return TransactionDB.open(options, txnDbOptions, path, cfDescs, cfHandles);
-        } finally {
-            if (opts != null) {
-                opts.close();
-            }
         }
     }
 
