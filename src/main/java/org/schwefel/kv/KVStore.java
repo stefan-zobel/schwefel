@@ -17,13 +17,20 @@ package org.schwefel.kv;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.rocksdb.ColumnFamilyDescriptor;
+import org.rocksdb.ColumnFamilyHandle;
+import org.rocksdb.ColumnFamilyOptions;
+import org.rocksdb.DBOptions;
 import org.rocksdb.FlushOptions;
 import org.rocksdb.Options;
 import org.rocksdb.ReadOptions;
+import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
 import org.rocksdb.Transaction;
@@ -49,11 +56,13 @@ public final class KVStore implements StoreOps {
     private TransactionDB txnDb;
     private TransactionDBOptions txnDbOptions;
     private TransactionOptions txnOpts;
-    private Options options;
+    private DBOptions options;
+    private ColumnFamilyOptions columnFamilyOptions;
     private WriteOptions writeOptions;
     private ReadOptions readOptions;
     private FlushOptions flushOptions;
     private FlushOptions flushOptionsNoWait;
+    private final ArrayList<ColumnFamilyHandle> cfHandles = new ArrayList<>();
     private final String path;
     private final Stats stats = new Stats();
 
@@ -64,10 +73,11 @@ public final class KVStore implements StoreOps {
     }
 
     private void open() {
-        options = new Options();
+        options = new DBOptions();
         options.setCreateIfMissing(true);
         options.setErrorIfExists(false);
         options.setIncreaseParallelism(Math.max(Runtime.getRuntime().availableProcessors(), 2));
+        columnFamilyOptions = new ColumnFamilyOptions();
         writeOptions = new WriteOptions();
         readOptions = new ReadOptions();
         flushOptions = new FlushOptions();
@@ -75,10 +85,31 @@ public final class KVStore implements StoreOps {
         flushOptionsNoWait = new FlushOptions();
         flushOptionsNoWait.setWaitForFlush(false);
         txnDbOptions = new TransactionDBOptions();
-        txnDb = (TransactionDB) wrapEx(() -> TransactionDB.open(options, txnDbOptions, path));
+        txnDb = (TransactionDB) wrapEx(() -> openDatabase());
         txnOpts = new TransactionOptions();
         open = true;
         lastSync = System.currentTimeMillis();
+    }
+
+    private TransactionDB openDatabase() throws RocksDBException {
+        Options opts = null;
+        try {
+            opts = new Options(options, columnFamilyOptions);
+            List<byte[]> families = RocksDB.listColumnFamilies(opts, path);
+            List<ColumnFamilyDescriptor> cfDescs = new ArrayList<ColumnFamilyDescriptor>();
+            for (byte[] cfName : families) {
+                cfDescs.add(new ColumnFamilyDescriptor(cfName, columnFamilyOptions));
+            }
+            if (cfDescs.isEmpty()) {
+                cfDescs.add(new ColumnFamilyDescriptor(new byte[] { 'd', 'e', 'f', 'a', 'u', 'l', 't' },
+                        columnFamilyOptions));
+            }
+            return TransactionDB.open(options, txnDbOptions, path, cfDescs, cfHandles);
+        } finally {
+            if (opts != null) {
+                opts.close();
+            }
+        }
     }
 
     @Override
@@ -89,22 +120,32 @@ public final class KVStore implements StoreOps {
         open = false;
         ignoreEx(() -> syncWAL());
         ignoreEx(() -> flush());
+        closeCfHandles();
         close(txnDb);
         close(txnDbOptions);
         close(txnOpts);
+        close(columnFamilyOptions);
         close(writeOptions);
         close(readOptions);
         close(flushOptions);
         close(flushOptionsNoWait);
         close(options);
+        cfHandles.clear();
         txnDb = null;
         txnDbOptions = null;
         txnOpts = null;
+        columnFamilyOptions = null;
         writeOptions = null;
         readOptions = null;
         flushOptions = null;
         flushOptionsNoWait = null;
         options = null;
+    }
+
+    private void closeCfHandles() {
+        for (ColumnFamilyHandle handle : cfHandles) {
+            close(handle);
+        }
     }
 
     @Override
