@@ -15,12 +15,15 @@
  */
 package org.schwefel.kv;
 
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,10 +46,11 @@ import org.rocksdb.WriteOptions;
 
 import static org.schwefel.kv.LexicographicByteArrayComparator.lexicographicalCompare;
 
-public final class KVStore implements StoreOps {
+public final class KVStore implements StoreOps, KindManagement {
 
     private static final long FLUSH_TIME_WINDOW_MILLIS = 985L;
     private static final long FLUSH_BATCH_SIZE = 20_000L;
+    private static final Charset UTF8 = Charset.forName("UTF-8");
 
     private static final Logger logger = Logger.getLogger(KVStore.class.getName());
 
@@ -147,6 +151,36 @@ public final class KVStore implements StoreOps {
         for (KindImpl kind : kinds.values()) {
             close(kind.handle());
         }
+    }
+
+    @Override
+    public synchronized Set<Kind> getKinds() {
+        return new TreeSet<>(kinds.values());
+    }
+
+    @Override
+    public synchronized Kind getKind(String kindName) {
+        return kinds.get(kindName);
+    }
+
+    @Override
+    public synchronized Kind getOrCreateKind(String kindName) {
+        if (Objects.requireNonNull(kindName).isEmpty()) {
+            throw new IllegalArgumentException("kindName: ");
+        }
+        Kind kind = getKind(kindName);
+        if (kind == null) {
+            kind = (Kind) wrapEx(() -> createKind(kindName));
+        }
+        return kind;
+    }
+
+    private Kind createKind(String kindName) throws RocksDBException {
+        ColumnFamilyHandle handle = txnDb
+                .createColumnFamily(new ColumnFamilyDescriptor(kindName.getBytes(UTF8), columnFamilyOptions));
+        KindImpl kind = new KindImpl(handle.getName(), handle);
+        kinds.put(kind.name(), kind);
+        return kind;
     }
 
     @Override
