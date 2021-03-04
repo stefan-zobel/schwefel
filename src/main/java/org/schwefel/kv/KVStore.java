@@ -154,6 +154,11 @@ public final class KVStore implements StoreOps, KindManagement {
     }
 
     @Override
+    public KindManagement getKindManagement() {
+        return this;
+    }
+
+    @Override
     public synchronized Set<Kind> getKinds() {
         return new TreeSet<>(kinds.values());
     }

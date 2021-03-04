@@ -38,5 +38,6 @@ public interface StoreOps extends BasicOps, AutoCloseable {
     boolean isOpen();
     void flush();
     void flushNoWait();
+    KindManagement getKindManagement();
     Stats getStats();
 }

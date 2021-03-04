@@ -5,27 +5,30 @@ import java.util.Set;
 
 import org.schwefel.kv.KVStore;
 import org.schwefel.kv.Kind;
+import org.schwefel.kv.StoreOps;
 
 public class KindSimpleTest {
 
     public static void main(String[] args) {
 
-        try (KVStore store = new KVStore(Paths.get("D:/Temp/rocksdb_database"))) {
-            Set<Kind> kinds = store.getKinds();
+        try (StoreOps store = new KVStore(Paths.get("D:/Temp/rocksdb_database"))) {
+            Set<Kind> kinds = store.getKindManagement().getKinds();
             System.out.println(kinds);
 
-            Kind def = store.getKind("default");
-            Kind not = store.getKind("does_not_exist");
+            Kind def = store.getKindManagement().getKind("default");
+            Kind not = store.getKindManagement().getKind("does_not_exist");
             System.out.println(def);
             System.out.println(not);
 
-            def = store.getOrCreateKind("default");
+            def = store.getKindManagement().getOrCreateKind("default");
             System.out.println(def);
 
-            Kind another = store.getOrCreateKind("another");
+            Kind another = store.getKindManagement().getOrCreateKind("another");
+            System.out.println(another);
+            another = store.getKindManagement().getOrCreateKind("another");
             System.out.println(another);
 
-            kinds = store.getKinds();
+            kinds = store.getKindManagement().getKinds();
             System.out.println(kinds);
         }
     }
