@@ -32,6 +32,10 @@ final class KindImpl implements Kind {
         this.handle = Objects.requireNonNull(handle);
     }
 
+    ColumnFamilyHandle handle() {
+        return handle;
+    }
+
     @Override
     public String name() {
         return name;

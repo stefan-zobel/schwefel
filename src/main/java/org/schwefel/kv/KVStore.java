@@ -63,8 +63,7 @@ public final class KVStore implements StoreOps {
     private ReadOptions readOptions;
     private FlushOptions flushOptions;
     private FlushOptions flushOptionsNoWait;
-    private final ArrayList<ColumnFamilyHandle> cfHandles = new ArrayList<>();
-    private final HashMap<String, Kind> kinds = new HashMap<>(); 
+    private final HashMap<String, KindImpl> kinds = new HashMap<>(); 
     private final String path;
     private final Stats stats = new Stats();
 
@@ -89,7 +88,6 @@ public final class KVStore implements StoreOps {
         txnDbOptions = new TransactionDBOptions();
         txnDb = (TransactionDB) wrapEx(() -> openDatabase());
         txnOpts = new TransactionOptions();
-        initializeKinds();
         open = true;
         lastSync = System.currentTimeMillis();
     }
@@ -97,7 +95,7 @@ public final class KVStore implements StoreOps {
     private TransactionDB openDatabase() throws RocksDBException {
         try (Options opts = new Options(options, columnFamilyOptions)) {
             List<byte[]> families = RocksDB.listColumnFamilies(opts, path);
-            List<ColumnFamilyDescriptor> cfDescs = new ArrayList<ColumnFamilyDescriptor>();
+            ArrayList<ColumnFamilyDescriptor> cfDescs = new ArrayList<>();
             for (byte[] cfName : families) {
                 cfDescs.add(new ColumnFamilyDescriptor(cfName, columnFamilyOptions));
             }
@@ -105,18 +103,13 @@ public final class KVStore implements StoreOps {
                 cfDescs.add(new ColumnFamilyDescriptor(new byte[] { 'd', 'e', 'f', 'a', 'u', 'l', 't' },
                         columnFamilyOptions));
             }
-            return TransactionDB.open(options, txnDbOptions, path, cfDescs, cfHandles);
-        }
-    }
-
-    private void initializeKinds() {
-        try {
+            ArrayList<ColumnFamilyHandle> cfHandles = new ArrayList<>(cfDescs.size());
+            TransactionDB txnDb = TransactionDB.open(options, txnDbOptions, path, cfDescs, cfHandles);
             for (ColumnFamilyHandle handle : cfHandles) {
                 KindImpl kind = new KindImpl(handle.getName(), handle);
                 kinds.put(kind.name(), kind);
             }
-        } catch (Exception e) {
-            throw new StoreException(e);
+            return txnDb;
         }
     }
 
@@ -138,7 +131,6 @@ public final class KVStore implements StoreOps {
         close(flushOptions);
         close(flushOptionsNoWait);
         close(options);
-        cfHandles.clear();
         kinds.clear();
         txnDb = null;
         txnDbOptions = null;
@@ -152,8 +144,8 @@ public final class KVStore implements StoreOps {
     }
 
     private void closeCfHandles() {
-        for (ColumnFamilyHandle handle : cfHandles) {
-            close(handle);
+        for (KindImpl kind : kinds.values()) {
+            close(kind.handle());
         }
     }
 
