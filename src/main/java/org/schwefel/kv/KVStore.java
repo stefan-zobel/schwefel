@@ -18,6 +18,7 @@ package org.schwefel.kv;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -63,6 +64,7 @@ public final class KVStore implements StoreOps {
     private FlushOptions flushOptions;
     private FlushOptions flushOptionsNoWait;
     private final ArrayList<ColumnFamilyHandle> cfHandles = new ArrayList<>();
+    private final HashMap<String, Kind> kinds = new HashMap<>(); 
     private final String path;
     private final Stats stats = new Stats();
 
@@ -87,6 +89,7 @@ public final class KVStore implements StoreOps {
         txnDbOptions = new TransactionDBOptions();
         txnDb = (TransactionDB) wrapEx(() -> openDatabase());
         txnOpts = new TransactionOptions();
+        initializeKinds();
         open = true;
         lastSync = System.currentTimeMillis();
     }
@@ -103,6 +106,17 @@ public final class KVStore implements StoreOps {
                         columnFamilyOptions));
             }
             return TransactionDB.open(options, txnDbOptions, path, cfDescs, cfHandles);
+        }
+    }
+
+    private void initializeKinds() {
+        try {
+            for (ColumnFamilyHandle handle : cfHandles) {
+                KindImpl kind = new KindImpl(handle.getName(), handle);
+                kinds.put(kind.name(), kind);
+            }
+        } catch (Exception e) {
+            throw new StoreException(e);
         }
     }
 
@@ -125,6 +139,7 @@ public final class KVStore implements StoreOps {
         close(flushOptionsNoWait);
         close(options);
         cfHandles.clear();
+        kinds.clear();
         txnDb = null;
         txnDbOptions = null;
         txnOpts = null;
