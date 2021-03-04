@@ -189,6 +189,11 @@ public final class KVStore implements StoreOps, KindManagement {
     }
 
     @Override
+    public synchronized Kind getDefaultKind() {
+        return getKind("default");
+    }
+
+    @Override
     public synchronized void put(byte[] key, byte[] value) {
         long start = System.nanoTime();
         Objects.requireNonNull(key, "key cannot be null");

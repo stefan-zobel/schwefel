@@ -30,6 +30,8 @@ public class KindSimpleTest {
 
             kinds = store.getKindManagement().getKinds();
             System.out.println(kinds);
+            def = store.getKindManagement().getDefaultKind();
+            System.out.println(def);
         }
     }
 }

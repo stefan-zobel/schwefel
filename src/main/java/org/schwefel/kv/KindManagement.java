@@ -22,4 +22,5 @@ public interface KindManagement {
     Set<Kind> getKinds();
     Kind getKind(String kindName);
     Kind getOrCreateKind(String kindName);
+    Kind getDefaultKind();
 }
