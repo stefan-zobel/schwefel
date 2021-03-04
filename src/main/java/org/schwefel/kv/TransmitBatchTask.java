@@ -15,6 +15,7 @@
  */
 package org.schwefel.kv;
 
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,17 +28,19 @@ public final class TransmitBatchTask implements AsyncTask {
 
     private final StoreOps store;
     private final SortedByteArrayMap keysValues;
+    private final KindImpl kind;
 
-    public TransmitBatchTask(StoreOps store, SortedByteArrayMap keysValues) {
-        this.store = store;
-        this.keysValues = keysValues;
+    public TransmitBatchTask(StoreOps store, Kind kind, SortedByteArrayMap keysValues) {
+        this.store = Objects.requireNonNull(store);
+        this.keysValues = Objects.requireNonNull(keysValues);
+        this.kind = Objects.requireNonNull((KindImpl) kind);
     }
 
     @Override
     public void run() {
         try {
             Batch batch = store.createBatch();
-            keysValues.forEach(new BatchWriter(batch));
+            keysValues.forEach(new BatchWriter(batch, kind));
             store.writeBatch(batch);
         } catch (Throwable t) {
             logger.log(Level.SEVERE, "", t);
@@ -47,16 +50,18 @@ public final class TransmitBatchTask implements AsyncTask {
     private static final class BatchWriter implements BiConsumer<byte[], byte[]> {
 
         private final Batch batch;
+        private final KindImpl kind;
 
-        BatchWriter(Batch batch) {
+        BatchWriter(Batch batch, KindImpl kind) {
             this.batch = batch;
+            this.kind = kind;
         }
 
         @Override
         public void accept(byte[] key, byte[] value) {
             if (key != null && key.length > 0) {
                 try {
-                    batch.put(key, value);
+                    batch.put(kind, key, value);
                 } catch (Throwable t) {
                     logger.log(Level.SEVERE, "", t);
                 }

@@ -17,7 +17,7 @@ package org.schwefel.kv;
 
 public interface Batch extends AutoCloseable {
 
-    void put(byte[] key, byte[] value);
-    void delete(byte[] key);
-    void singleDelete(byte[] key);
+    void put(Kind kind, byte[] key, byte[] value);
+    void delete(Kind kind, byte[] key);
+    void singleDelete(Kind kind, byte[] key);
 }
