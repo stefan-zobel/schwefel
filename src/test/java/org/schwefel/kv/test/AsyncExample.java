@@ -5,6 +5,7 @@ import net.volcanite.task.AsyncExecutor;
 import java.nio.file.Paths;
 
 import org.schwefel.kv.KVStore;
+import org.schwefel.kv.Kind;
 import org.schwefel.kv.StoreOps;
 import org.schwefel.kv.TransmitTask;
 
@@ -21,12 +22,13 @@ public class AsyncExample {
         long runtime = 0L;
 
         try (StoreOps store = new KVStore(Paths.get("D:/Temp/rocksdb_database"))) {
+            Kind defaultKind = store.getKindManagement().getDefaultKind();
             for (int i = 0; i < RUNS; ++i) {
                 long start = System.currentTimeMillis();
                 byte[] key = randomBytes();
                 byte[] value = randomBytes();
 
-                executor.execute(new TransmitTask(store, key, value));
+                executor.execute(new TransmitTask(store, defaultKind, key, value));
                 runtime += (System.currentTimeMillis() - start);
             }
 

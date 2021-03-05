@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.nio.file.Paths;
 
 import org.schwefel.kv.KVStore;
+import org.schwefel.kv.Kind;
 import org.schwefel.kv.Stats;
 import org.schwefel.kv.StoreOps;
 
@@ -18,12 +19,13 @@ public class KVStorePerfTest {
         long runtime = 0L;
 
         try (StoreOps store = new KVStore(Paths.get("D:/Temp/rocksdb_database"))) {
+            Kind defaultKind = store.getKindManagement().getDefaultKind();
             for (int i = 0; i < RUNS; ++i) {
                 long start = System.currentTimeMillis();
                 byte[] key = randomBytes();
                 byte[] value = randomBytes();
 
-                store.put(key, value);
+                store.put(defaultKind, key, value);
                 runtime += (System.currentTimeMillis() - start);
             }
 

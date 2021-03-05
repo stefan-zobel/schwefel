@@ -5,6 +5,7 @@ import net.volcanite.task.AsyncExecutor;
 import java.nio.file.Paths;
 
 import org.schwefel.kv.KVStore;
+import org.schwefel.kv.Kind;
 import org.schwefel.kv.SortedByteArrayMap;
 import org.schwefel.kv.StoreOps;
 import org.schwefel.kv.TransmitBatchTask;
@@ -23,6 +24,7 @@ public class AsyncBatchExample {
 
         try (StoreOps store = new KVStore(Paths.get("D:/Temp/rocksdb_database"))) {
             SortedByteArrayMap map = new SortedByteArrayMap();
+            Kind defaultKind = store.getKindManagement().getDefaultKind();
 
             for (int i = 0; i < RUNS; ++i) {
                 long start = System.currentTimeMillis();
@@ -31,7 +33,7 @@ public class AsyncBatchExample {
                 map.put(key, value);
 
                 if (i % 500 == 0) {
-                    executor.execute(new TransmitBatchTask(store, map));
+                    executor.execute(new TransmitBatchTask(store, defaultKind, map));
                     map = new SortedByteArrayMap();
                 }
                 runtime += (System.currentTimeMillis() - start);

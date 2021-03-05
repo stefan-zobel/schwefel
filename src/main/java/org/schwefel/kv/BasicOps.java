@@ -17,8 +17,8 @@ package org.schwefel.kv;
 
 public interface BasicOps {
 
-    void put(byte[] key, byte[] value);
-    byte[] get(byte[] key);
-    void delete(byte[] key);
-    byte[] updateIfPresent(byte[] key, byte[] value);
+    void put(Kind kind, byte[] key, byte[] value);
+    byte[] get(Kind kind, byte[] key);
+    void delete(Kind kind, byte[] key);
+    byte[] updateIfPresent(Kind kind, byte[] key, byte[] value);
 }

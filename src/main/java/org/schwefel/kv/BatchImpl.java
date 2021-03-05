@@ -29,33 +29,36 @@ class BatchImpl implements Batch, AutoCloseable {
     }
 
     @Override
-    public synchronized void put(byte[] key, byte[] value) {
+    public synchronized void put(Kind kind, byte[] key, byte[] value) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
         try {
-            batch.put(key, value);
+            batch.put(((KindImpl) kind).handle(), key, value);
         } catch (RocksDBException e) {
             throw new StoreException(e);
         }
     }
 
     @Override
-    public synchronized void delete(byte[] key) {
+    public synchronized void delete(Kind kind, byte[] key) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
         try {
-            batch.delete(key);
+            batch.delete(((KindImpl) kind).handle(), key);
         } catch (RocksDBException e) {
             throw new StoreException(e);
         }
     }
 
     @Override
-    public synchronized void singleDelete(byte[] key) {
+    public synchronized void singleDelete(Kind kind, byte[] key) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
         try {
-            batch.singleDelete(key);
+            batch.singleDelete(((KindImpl) kind).handle(), key);
         } catch (RocksDBException e) {
             throw new StoreException(e);
         }

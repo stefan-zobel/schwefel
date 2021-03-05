@@ -6,6 +6,7 @@ import java.util.function.BiConsumer;
 
 import org.schwefel.kv.ForEachKeyValue;
 import org.schwefel.kv.KVStore;
+import org.schwefel.kv.Kind;
 import org.schwefel.kv.StoreOps;
 
 public class FindMinKeyTest {
@@ -34,13 +35,14 @@ public class FindMinKeyTest {
     public static void main(String[] args) {
 
         try (StoreOps store = new KVStore(Paths.get("D:/Temp/rocksdb_database"))) {
+            Kind defaultKind = store.getKindManagement().getDefaultKind();
             for (int i = 0; i < keys.length; ++i) {
                 byte[] key = keys[i];
-                store.put(key, value);
+                store.put(defaultKind, key, value);
             }
 
             // retrieve in key order
-            try (ForEachKeyValue kv = store.scanAll()) {
+            try (ForEachKeyValue kv = store.scanAll(defaultKind)) {
                 kv.forEachRemaining(new BiConsumer<byte[], byte[]>() {
                     @Override
                     public void accept(byte[] key, byte[] value) {
@@ -50,53 +52,53 @@ public class FindMinKeyTest {
             }
 
             // min keys for several prefixes
-            findMinKey(store);
+            findMinKey(store, defaultKind);
         }
     }
 
-    private static void findMinKey(StoreOps store) {
+    private static void findMinKey(StoreOps store, Kind kind) {
         byte[] keyPrefix = { 3 };
-        byte[] key = store.findMinKey(keyPrefix);
+        byte[] key = store.findMinKey(kind, keyPrefix);
         System.out.println("key: " + Arrays.toString(key) + " , prefix:" + Arrays.toString(keyPrefix));
 
         keyPrefix = new byte[] { 4, 4, 4, 4, 4 };
-        key = store.findMinKey(keyPrefix);
+        key = store.findMinKey(kind, keyPrefix);
         System.out.println("key: " + Arrays.toString(key) + " , prefix:" + Arrays.toString(keyPrefix));
 
         keyPrefix = new byte[] { 0, 0, 0, 0, 0 };
-        key = store.findMinKey(keyPrefix);
+        key = store.findMinKey(kind, keyPrefix);
         System.out.println("key: " + Arrays.toString(key) + " , prefix:" + Arrays.toString(keyPrefix));
 
         keyPrefix = new byte[] { 0, 0, 0, 0 };
-        key = store.findMinKey(keyPrefix);
+        key = store.findMinKey(kind, keyPrefix);
         System.out.println("key: " + Arrays.toString(key) + " , prefix:" + Arrays.toString(keyPrefix));
 
         keyPrefix = new byte[] { 0, 0, 0 };
-        key = store.findMinKey(keyPrefix);
+        key = store.findMinKey(kind, keyPrefix);
         System.out.println("key: " + Arrays.toString(key) + " , prefix:" + Arrays.toString(keyPrefix));
 
         keyPrefix = new byte[] { 0 };
-        key = store.findMinKey(keyPrefix);
+        key = store.findMinKey(kind, keyPrefix);
         System.out.println("key: " + Arrays.toString(key) + " , prefix:" + Arrays.toString(keyPrefix));
 
         keyPrefix = new byte[] {};
-        key = store.findMinKey(keyPrefix);
+        key = store.findMinKey(kind, keyPrefix);
         System.out.println("key: " + Arrays.toString(key) + " , prefix:" + Arrays.toString(keyPrefix));
 
         keyPrefix = new byte[] { 1 };
-        key = store.findMinKey(keyPrefix);
+        key = store.findMinKey(kind, keyPrefix);
         System.out.println("key: " + Arrays.toString(key) + " , prefix:" + Arrays.toString(keyPrefix));
 
         keyPrefix = new byte[] { 2 };
-        key = store.findMinKey(keyPrefix);
+        key = store.findMinKey(kind, keyPrefix);
         System.out.println("key: " + Arrays.toString(key) + " , prefix:" + Arrays.toString(keyPrefix));
 
         keyPrefix = new byte[] { 2, 2 };
-        key = store.findMinKey(keyPrefix);
+        key = store.findMinKey(kind, keyPrefix);
         System.out.println("key: " + Arrays.toString(key) + " , prefix:" + Arrays.toString(keyPrefix));
 
         keyPrefix = new byte[] { 1, 1 };
-        key = store.findMinKey(keyPrefix);
+        key = store.findMinKey(kind, keyPrefix);
         System.out.println("key: " + Arrays.toString(key) + " , prefix:" + Arrays.toString(keyPrefix));
     }
 }

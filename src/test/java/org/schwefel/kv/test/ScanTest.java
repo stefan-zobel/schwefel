@@ -8,6 +8,7 @@ import java.util.function.BiConsumer;
 
 import org.schwefel.kv.ForEachKeyValue;
 import org.schwefel.kv.KVStore;
+import org.schwefel.kv.Kind;
 import org.schwefel.kv.StoreOps;
 
 import net.volcanite.util.Byte4Key;
@@ -31,14 +32,15 @@ public class ScanTest {
         Collections.reverse(values);
 
         try (StoreOps store = new KVStore(Paths.get("D:/Temp/rocksdb_database"))) {
+            Kind defaultKind = store.getKindManagement().getDefaultKind();
             for (int i = 0; i < keys.size(); ++i) {
                 byte[] key = keys.get(i);
                 System.out.println("store key : " + getIntB(key));
-                store.put(key, values.get(i));
+                store.put(defaultKind, key, values.get(i));
             }
 
             // retrieve in key order (= reversed storage order)
-            try (ForEachKeyValue kv = store.scanAll(Byte4Key.minKey())) {
+            try (ForEachKeyValue kv = store.scanAll(defaultKind, Byte4Key.minKey())) {
                 kv.forEachRemaining(new BiConsumer<byte[], byte[]>() {
                     @Override
                     public void accept(byte[] key, byte[] value) {
