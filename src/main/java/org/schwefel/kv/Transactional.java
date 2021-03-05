@@ -15,8 +15,11 @@
  */
 package org.schwefel.kv;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
+import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
@@ -136,13 +139,18 @@ class Transactional implements Tx {
     }
 
     @Override
-    public synchronized byte[][] multiGet(byte[][] keys) { // XXX
+    public synchronized byte[][] multiGet(List<Kind> kinds, byte[][] keys) {
+        Objects.requireNonNull(kinds, "kinds cannot be null");
         Objects.requireNonNull(keys, "keys cannot be null");
+        if (kinds.size() != keys.length) {
+            throw new IllegalArgumentException(
+                    "Each key must have an associated Kind. kinds = " + kinds.size() + " != keys = " + keys.length);
+        }
         checkInnerKeys(keys);
         validateOwned();
         validateReadOptions();
         try {
-            return txn.multiGet(readOptions, keys);
+            return txn.multiGet(readOptions, toCfHandleList(kinds), keys);
         } catch (RocksDBException e) {
             throw new StoreException(e);
         }
@@ -255,16 +263,25 @@ class Transactional implements Tx {
     }
 
     @Override
-    public synchronized byte[][] multiGetForUpdate(byte[][] keys) { // XXX
+    public synchronized byte[][] multiGetForUpdate(List<Kind> kinds, byte[][] keys) {
+        Objects.requireNonNull(kinds, "kinds cannot be null");
         Objects.requireNonNull(keys, "keys cannot be null");
+        if (kinds.size() != keys.length) {
+            throw new IllegalArgumentException(
+                    "Each key must have an associated Kind. kinds = " + kinds.size() + " != keys = " + keys.length);
+        }
         checkInnerKeys(keys);
         validateOwned();
         validateReadOptions();
         try {
-            return txn.multiGetForUpdate(readOptions, keys);
+            return txn.multiGetForUpdate(readOptions, toCfHandleList(kinds), keys);
         } catch (RocksDBException e) {
             throw new StoreException(e);
         }
+    }
+
+    private static List<ColumnFamilyHandle> toCfHandleList(List<Kind> kinds) {
+        return kinds.stream().map(k -> ((KindImpl) k).handle()).collect(Collectors.toList());
     }
 
     @Override

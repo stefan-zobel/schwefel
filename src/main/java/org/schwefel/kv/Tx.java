@@ -15,6 +15,8 @@
  */
 package org.schwefel.kv;
 
+import java.util.List;
+
 public interface Tx extends BasicOps, AutoCloseable {
 
     void commit();
@@ -26,10 +28,10 @@ public interface Tx extends BasicOps, AutoCloseable {
     void put(Kind kind, byte[] key, byte[] value);
     void putIfAbsent(Kind kind, byte[] key, byte[] value);
     byte[] get(Kind kind, byte[] key);
-    byte[][] multiGet(byte[][] keys);
+    byte[][] multiGet(List<Kind> kinds, byte[][] keys);
     byte[] getForUpdate(Kind kind, byte[] key);
     byte[] getForUpdate(Kind kind, byte[] key, boolean exclusive);
-    byte[][] multiGetForUpdate(byte[][] keys);
+    byte[][] multiGetForUpdate(List<Kind> kinds, byte[][] keys);
     void undoGetForUpdate(Kind kind, byte[] key);
     void delete(Kind kind, byte[] key);
     byte[] deleteIfPresent(Kind kind, byte[] key);
