@@ -15,6 +15,7 @@
  */
 package org.schwefel.kv;
 
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,11 +26,13 @@ public final class TransmitTask implements AsyncTask {
     private static final Logger logger = Logger.getLogger(TransmitTask.class.getName());
 
     private final StoreOps store;
+    private final KindImpl kind;
     private final byte[] key;
     private final byte[] value;
 
-    public TransmitTask(StoreOps store, byte[] key, byte[] value) {
-        this.store = store;
+    public TransmitTask(StoreOps store, Kind kind, byte[] key, byte[] value) {
+        this.store = Objects.requireNonNull(store);
+        this.kind = Objects.requireNonNull((KindImpl) kind);
         this.key = key;
         this.value = value;
     }
@@ -39,7 +42,7 @@ public final class TransmitTask implements AsyncTask {
         byte[] key = this.key;
         if (key != null && key.length > 0) {
             try {
-                store.put(key, value);
+                store.put(kind, key, value);
             } catch (Throwable t) {
                 logger.log(Level.SEVERE, "", t);
             }

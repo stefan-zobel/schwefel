@@ -6,6 +6,7 @@ import java.util.function.BiConsumer;
 
 import org.schwefel.kv.ForEachKeyValue;
 import org.schwefel.kv.KVStore;
+import org.schwefel.kv.Kind;
 import org.schwefel.kv.StoreOps;
 
 public class FindMaxKeyLessThanTest {
@@ -35,9 +36,10 @@ public class FindMaxKeyLessThanTest {
     public static void main(String[] args) {
 
         try (StoreOps store = new KVStore(Paths.get("D:/Temp/rocksdb_database"))) {
+            Kind defaultKind = store.getKindManagement().getDefaultKind();
             for (int i = 0; i < keys.length; ++i) {
                 byte[] key = keys[i];
-                store.put(key, value);
+                store.put(defaultKind, key, value);
             }
 
             // retrieve in key order

@@ -9,6 +9,7 @@ import java.util.function.BiConsumer;
 import org.schwefel.kv.BasicOps;
 import org.schwefel.kv.ForEachKeyValue;
 import org.schwefel.kv.KVStore;
+import org.schwefel.kv.Kind;
 import org.schwefel.kv.StoreOps;
 
 import net.volcanite.util.Byte4Key;
@@ -32,8 +33,9 @@ public class ScanDeleteTest {
         Collections.reverse(values);
 
         try (StoreOps store = new KVStore(Paths.get("D:/Temp/rocksdb_database"))) {
+            Kind defaultKind = store.getKindManagement().getDefaultKind();
             for (int i = 0; i < keys.size(); ++i) {
-                store.put(keys.get(i), values.get(i));
+                store.put(defaultKind, keys.get(i), values.get(i));
             }
 
             // retrieve in key order (= reversed storage order)
@@ -46,7 +48,7 @@ public class ScanDeleteTest {
                         System.out.println(stringVal + " / " + Arrays.toString(key));
                         if (stringVal.length() == 2 && Integer.parseInt(stringVal) % 2 == 0) {
                             System.out.println("Deleting value " + stringVal);
-                            ops.delete(key);
+                            ops.delete(defaultKind, key);
                         }
                     }
                 });

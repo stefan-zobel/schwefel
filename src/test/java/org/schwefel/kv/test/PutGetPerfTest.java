@@ -4,6 +4,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.schwefel.kv.KVStore;
+import org.schwefel.kv.Kind;
 import org.schwefel.kv.Stats;
 import org.schwefel.kv.StoreOps;
 
@@ -19,13 +20,14 @@ public class PutGetPerfTest {
         long runtime = 0L;
 
         try (StoreOps store = new KVStore(Paths.get("D:/Temp/rocksdb_database"))) {
+            Kind defaultKind = store.getKindManagement().getDefaultKind();
             for (int i = 0; i < RUNS; ++i) {
                 long start = System.currentTimeMillis();
                 byte[] key = randomBytes();
                 byte[] value = randomBytes();
 
-                store.put(key, value);
-                byte[] valueRead = store.get(key);
+                store.put(defaultKind, key, value);
+                byte[] valueRead = store.get(defaultKind, key);
                 runtime += (System.currentTimeMillis() - start);
 
                 if (valueRead == null) {

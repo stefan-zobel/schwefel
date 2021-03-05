@@ -27,13 +27,13 @@ public final class TransmitBatchTask implements AsyncTask {
     static final Logger logger = Logger.getLogger(TransmitBatchTask.class.getName());
 
     private final StoreOps store;
-    private final SortedByteArrayMap keysValues;
     private final KindImpl kind;
+    private final SortedByteArrayMap keysValues;
 
     public TransmitBatchTask(StoreOps store, Kind kind, SortedByteArrayMap keysValues) {
         this.store = Objects.requireNonNull(store);
-        this.keysValues = Objects.requireNonNull(keysValues);
         this.kind = Objects.requireNonNull((KindImpl) kind);
+        this.keysValues = Objects.requireNonNull(keysValues);
     }
 
     @Override

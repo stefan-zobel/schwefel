@@ -97,23 +97,25 @@ class Transactional implements Tx {
     }
 
     @Override
-    public synchronized void put(byte[] key, byte[] value) {
+    public synchronized void put(Kind kind, byte[] key, byte[] value) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
         try {
-            txn.put(key, value);
+            txn.put(((KindImpl) kind).handle(), key, value);
         } catch (RocksDBException e) {
             throw new StoreException(e);
         }
     }
 
     @Override
-    public synchronized void putIfAbsent(byte[] key, byte[] value) {
+    public synchronized void putIfAbsent(Kind kind, byte[] key, byte[] value) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
         try {
-            if (get(key) == null) {
-                txn.put(key, value);
+            if (get(kind, key) == null) {
+                txn.put(((KindImpl) kind).handle(), key, value);
             }
         } catch (RocksDBException e) {
             throw new StoreException(e);
@@ -121,19 +123,20 @@ class Transactional implements Tx {
     }
 
     @Override
-    public synchronized byte[] get(byte[] key) {
+    public synchronized byte[] get(Kind kind, byte[] key) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
         validateReadOptions();
         try {
-            return txn.get(readOptions, key);
+            return txn.get(((KindImpl) kind).handle(), readOptions, key);
         } catch (RocksDBException e) {
             throw new StoreException(e);
         }
     }
 
     @Override
-    public synchronized byte[][] multiGet(byte[][] keys) {
+    public synchronized byte[][] multiGet(byte[][] keys) { // XXX
         Objects.requireNonNull(keys, "keys cannot be null");
         checkInnerKeys(keys);
         validateOwned();
@@ -146,60 +149,66 @@ class Transactional implements Tx {
     }
 
     @Override
-    public synchronized ForEachKeyValue scanAll() {
+    public synchronized ForEachKeyValue scanAll(Kind kind) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         validateOwned();
         validateReadOptions();
-        RocksIterator it = Objects.requireNonNull(txn.getIterator(readOptions));
+        RocksIterator it = Objects.requireNonNull(txn.getIterator(readOptions, ((KindImpl) kind).handle()));
         stats.incOpenCursorsCount();
         it.seekToFirst();
         return new ForEachAll(it, stats, this);
     }
 
     @Override
-    public synchronized ForEachKeyValue scanAll(byte[] beginKey) {
+    public synchronized ForEachKeyValue scanAll(Kind kind, byte[] beginKey) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(beginKey, "beginKey cannot be null");
         validateOwned();
         validateReadOptions();
-        RocksIterator it = Objects.requireNonNull(txn.getIterator(readOptions));
+        RocksIterator it = Objects.requireNonNull(txn.getIterator(readOptions, ((KindImpl) kind).handle()));
         stats.incOpenCursorsCount();
         it.seek(beginKey);
         return new ForEachAll(it, stats, this);
     }
 
     @Override
-    public synchronized ForEachKeyValue scanRange(byte[] beginKey, byte[] endKey) {
+    public synchronized ForEachKeyValue scanRange(Kind kind, byte[] beginKey, byte[] endKey) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(beginKey, "beginKey cannot be null");
         Objects.requireNonNull(endKey, "endKey cannot be null");
         validateOwned();
         validateReadOptions();
-        RocksIterator it = Objects.requireNonNull(txn.getIterator(readOptions));
+        RocksIterator it = Objects.requireNonNull(txn.getIterator(readOptions, ((KindImpl) kind).handle()));
         stats.incOpenCursorsCount();
         it.seek(beginKey);
         return new ForEachRange(it, endKey, stats, this);
     }
 
     @Override
-    public synchronized byte[] findMinKey(byte[] keyPrefix) {
+    public synchronized byte[] findMinKey(Kind kind, byte[] keyPrefix) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(keyPrefix, "keyPrefix cannot be null");
         validateOwned();
         validateReadOptions();
-        RocksIterator it = Objects.requireNonNull(txn.getIterator(readOptions));
+        RocksIterator it = Objects.requireNonNull(txn.getIterator(readOptions, ((KindImpl) kind).handle()));
         stats.incOpenCursorsCount();
         return MinMaxKeyIt.findMinKey(it, stats, keyPrefix);
     }
 
     @Override
-    public synchronized byte[] findMaxKey(byte[] keyPrefix) {
+    public synchronized byte[] findMaxKey(Kind kind, byte[] keyPrefix) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(keyPrefix, "keyPrefix cannot be null");
         validateOwned();
         validateReadOptions();
-        RocksIterator it = Objects.requireNonNull(txn.getIterator(readOptions));
+        RocksIterator it = Objects.requireNonNull(txn.getIterator(readOptions, ((KindImpl) kind).handle()));
         stats.incOpenCursorsCount();
         return MinMaxKeyIt.findMaxKey(it, stats, keyPrefix);
     }
 
     @Override
-    public synchronized byte[] findMaxKeyLessThan(byte[] keyPrefix, byte[] upperBound) {
+    public synchronized byte[] findMaxKeyLessThan(Kind kind, byte[] keyPrefix, byte[] upperBound) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(keyPrefix, "keyPrefix cannot be null");
         Objects.requireNonNull(upperBound, "upperBound cannot be null");
         validateOwned();
@@ -207,13 +216,14 @@ class Transactional implements Tx {
         if (keyPrefix.length >= upperBound.length && lexicographicalCompare(keyPrefix, upperBound) > 0) {
             return null;
         }
-        RocksIterator it = Objects.requireNonNull(txn.getIterator(readOptions));
+        RocksIterator it = Objects.requireNonNull(txn.getIterator(readOptions, ((KindImpl) kind).handle()));
         stats.incOpenCursorsCount();
         return MinMaxKeyIt.findMaxKeyLessThan(it, stats, keyPrefix, upperBound);
     }
 
     @Override
-    public synchronized byte[] findMinKeyGreaterThan(byte[] keyPrefix, byte[] lowerBound) {
+    public synchronized byte[] findMinKeyGreaterThan(Kind kind, byte[] keyPrefix, byte[] lowerBound) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(keyPrefix, "keyPrefix cannot be null");
         Objects.requireNonNull(lowerBound, "lowerBound cannot be null");
         validateOwned();
@@ -221,30 +231,31 @@ class Transactional implements Tx {
         if (keyPrefix.length >= lowerBound.length && lexicographicalCompare(keyPrefix, lowerBound) < 0) {
             return null;
         }
-        RocksIterator it = Objects.requireNonNull(txn.getIterator(readOptions));
+        RocksIterator it = Objects.requireNonNull(txn.getIterator(readOptions, ((KindImpl) kind).handle()));
         stats.incOpenCursorsCount();
         return MinMaxKeyIt.findMinKeyGreaterThan(it, stats, keyPrefix, lowerBound);
     }
 
     @Override
-    public byte[] getForUpdate(byte[] key) {
-        return getForUpdate(key, true);
+    public byte[] getForUpdate(Kind kind, byte[] key) {
+        return getForUpdate(kind, key, true);
     }
 
     @Override
-    public synchronized byte[] getForUpdate(byte[] key, boolean exclusive) {
+    public synchronized byte[] getForUpdate(Kind kind, byte[] key, boolean exclusive) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
         validateReadOptions();
         try {
-            return txn.getForUpdate(readOptions, key, exclusive);
+            return txn.getForUpdate(readOptions, ((KindImpl) kind).handle(), key, exclusive);
         } catch (RocksDBException e) {
             throw new StoreException(e);
         }
     }
 
     @Override
-    public synchronized byte[][] multiGetForUpdate(byte[][] keys) {
+    public synchronized byte[][] multiGetForUpdate(byte[][] keys) { // XXX
         Objects.requireNonNull(keys, "keys cannot be null");
         checkInnerKeys(keys);
         validateOwned();
@@ -257,31 +268,34 @@ class Transactional implements Tx {
     }
 
     @Override
-    public synchronized void undoGetForUpdate(byte[] key) {
+    public synchronized void undoGetForUpdate(Kind kind, byte[] key) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
-        txn.undoGetForUpdate(key);
+        txn.undoGetForUpdate(((KindImpl) kind).handle(), key);
     }
 
     @Override
-    public synchronized void delete(byte[] key) {
+    public synchronized void delete(Kind kind, byte[] key) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
         try {
-            txn.delete(key);
+            txn.delete(((KindImpl) kind).handle(), key);
         } catch (RocksDBException e) {
             throw new StoreException(e);
         }
     }
 
     @Override
-    public synchronized byte[] deleteIfPresent(byte[] key) {
+    public synchronized byte[] deleteIfPresent(Kind kind, byte[] key) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
         byte[] oldVal = null;
         try {
-            if ((oldVal = get(key)) != null) {
-                txn.delete(key);
+            if ((oldVal = get(kind, key)) != null) {
+                txn.delete(((KindImpl) kind).handle(), key);
             }
         } catch (RocksDBException e) {
             throw new StoreException(e);
@@ -290,24 +304,26 @@ class Transactional implements Tx {
     }
 
     @Override
-    public synchronized void singleDelete(byte[] key) {
+    public synchronized void singleDelete(Kind kind, byte[] key) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
         try {
-            txn.singleDelete(key);
+            txn.singleDelete(((KindImpl) kind).handle(), key);
         } catch (RocksDBException e) {
             throw new StoreException(e);
         }
     }
 
     @Override
-    public synchronized byte[] updateIfPresent(byte[] key, byte[] value) {
+    public synchronized byte[] updateIfPresent(Kind kind, byte[] key, byte[] value) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
         validateOwned();
         byte[] oldVal = null;
         try {
-            if ((oldVal = get(key)) != null) {
-                txn.put(key, value);
+            if ((oldVal = get(kind, key)) != null) {
+                txn.put(((KindImpl) kind).handle(), key, value);
             }
         } catch (RocksDBException e) {
             throw new StoreException(e);

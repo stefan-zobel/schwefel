@@ -18,12 +18,12 @@ package org.schwefel.kv;
 public interface StoreOps extends BasicOps, AutoCloseable {
 
     void close();
-    void put(byte[] key, byte[] value);
-    void putIfAbsent(byte[] key, byte[] value);
-    byte[] get(byte[] key);
-    void delete(byte[] key);
-    byte[] deleteIfPresent(byte[] key);
-    byte[] updateIfPresent(byte[] key, byte[] value);
+    void put(Kind kind, byte[] key, byte[] value);
+    void putIfAbsent(Kind kind, byte[] key, byte[] value);
+    byte[] get(Kind kind, byte[] key);
+    void delete(Kind kind, byte[] key);
+    byte[] deleteIfPresent(Kind kind, byte[] key);
+    byte[] updateIfPresent(Kind kind, byte[] key, byte[] value);
     Batch createBatch();
     void writeBatch(Batch batch);
     ForEachKeyValue scanAll();

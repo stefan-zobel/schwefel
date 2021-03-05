@@ -194,12 +194,13 @@ public final class KVStore implements StoreOps, KindManagement {
     }
 
     @Override
-    public synchronized void put(byte[] key, byte[] value) {
+    public synchronized void put(Kind kind, byte[] key, byte[] value) {
         long start = System.nanoTime();
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
         validateOpen();
         try {
-            put_(key, value);
+            put_(kind, key, value);
         } catch (RocksDBException e) {
             throw new StoreException(e);
         } finally {
@@ -207,10 +208,10 @@ public final class KVStore implements StoreOps, KindManagement {
         }
     }
 
-    private void put_(byte[] key, byte[] value) throws RocksDBException {
+    private void put_(Kind kind, byte[] key, byte[] value) throws RocksDBException {
         long putStart = System.nanoTime();
         try (Transaction txn = txnDb.beginTransaction(writeOptions, txnOpts)) {
-            txn.put(key, value);
+            txn.put(((KindImpl) kind).handle(), key, value);
             txn.commit();
             stats.putTimeNanos.accept(System.nanoTime() - putStart);
             occasionalWalSync();
@@ -231,13 +232,14 @@ public final class KVStore implements StoreOps, KindManagement {
     }
 
     @Override
-    public synchronized void putIfAbsent(byte[] key, byte[] value) {
+    public synchronized void putIfAbsent(Kind kind, byte[] key, byte[] value) {
         long start = System.nanoTime();
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
         validateOpen();
         try {
-            if (get_(key) == null) {
-                put_(key, value);
+            if (get_(kind, key) == null) {
+                put_(kind, key, value);
             }
         } catch (RocksDBException e) {
             throw new StoreException(e);
@@ -247,14 +249,15 @@ public final class KVStore implements StoreOps, KindManagement {
     }
 
     @Override
-    public synchronized byte[] deleteIfPresent(byte[] key) {
+    public synchronized byte[] deleteIfPresent(Kind kind, byte[] key) {
         long start = System.nanoTime();
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
         validateOpen();
         byte[] oldVal = null;
         try {
-            if ((oldVal = get_(key)) != null) {
-                delete_(key);
+            if ((oldVal = get_(kind, key)) != null) {
+                delete_(kind, key);
             }
         } catch (RocksDBException e) {
             throw new StoreException(e);
@@ -265,14 +268,15 @@ public final class KVStore implements StoreOps, KindManagement {
     }
 
     @Override
-    public synchronized byte[] updateIfPresent(byte[] key, byte[] value) {
+    public synchronized byte[] updateIfPresent(Kind kind, byte[] key, byte[] value) {
         long start = System.nanoTime();
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
         validateOpen();
         byte[] oldVal = null;
         try {
-            if ((oldVal = get_(key)) != null) {
-                put_(key, value);
+            if ((oldVal = get_(kind, key)) != null) {
+                put_(kind, key, value);
             }
         } catch (RocksDBException e) {
             throw new StoreException(e);
@@ -283,12 +287,13 @@ public final class KVStore implements StoreOps, KindManagement {
     }
 
     @Override
-    public synchronized byte[] get(byte[] key) {
+    public synchronized byte[] get(Kind kind, byte[] key) {
         long start = System.nanoTime();
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
         validateOpen();
         try {
-            return get_(key);
+            return get_(kind, key);
         } catch (RocksDBException e) {
             throw new StoreException(e);
         } finally {
@@ -296,22 +301,23 @@ public final class KVStore implements StoreOps, KindManagement {
         }
     }
 
-    private byte[] get_(byte[] key) throws RocksDBException {
+    private byte[] get_(Kind kind, byte[] key) throws RocksDBException {
         long start = System.nanoTime();
         try {
-            return txnDb.get(readOptions, key);
+            return txnDb.get(((KindImpl) kind).handle(), readOptions, key);
         } finally {
             stats.getTimeNanos.accept(System.nanoTime() - start);
         }
     }
 
     @Override
-    public synchronized void delete(byte[] key) {
+    public synchronized void delete(Kind kind, byte[] key) {
         long start = System.nanoTime();
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
         validateOpen();
         try {
-            delete_(key);
+            delete_(kind, key);
         } catch (RocksDBException e) {
             throw new StoreException(e);
         } finally {
@@ -319,10 +325,10 @@ public final class KVStore implements StoreOps, KindManagement {
         }
     }
 
-    private void delete_(byte[] key) throws RocksDBException {
+    private void delete_(Kind kind, byte[] key) throws RocksDBException {
         long delStart = System.nanoTime();
         try (Transaction txn = txnDb.beginTransaction(writeOptions, txnOpts)) {
-            txn.delete(key);
+            txn.delete(((KindImpl) kind).handle(), key);
             txn.commit();
             stats.deleteTimeNanos.accept(System.nanoTime() - delStart);
             occasionalWalSync();
