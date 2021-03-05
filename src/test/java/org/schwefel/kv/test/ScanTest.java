@@ -40,7 +40,7 @@ public class ScanTest {
             }
 
             // retrieve in key order (= reversed storage order)
-            try (ForEachKeyValue kv = store.scanAll(Byte4Key.minKey())) {
+            try (ForEachKeyValue kv = store.scanAll(defaultKind, Byte4Key.minKey())) {
                 kv.forEachRemaining(new BiConsumer<byte[], byte[]>() {
                     @Override
                     public void accept(byte[] key, byte[] value) {

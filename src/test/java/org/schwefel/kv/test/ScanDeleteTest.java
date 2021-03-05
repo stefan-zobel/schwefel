@@ -39,7 +39,7 @@ public class ScanDeleteTest {
             }
 
             // retrieve in key order (= reversed storage order)
-            try (ForEachKeyValue kv = store.scanAll()) {
+            try (ForEachKeyValue kv = store.scanAll(defaultKind)) {
                 BasicOps ops = kv.ops();
                 kv.forEachRemaining(new BiConsumer<byte[], byte[]>() {
                     @Override
@@ -55,7 +55,7 @@ public class ScanDeleteTest {
             }
             System.out.println("++++++ REFETCH ++++++");
             // check that docs have been deleted
-            try (ForEachKeyValue kv = store.scanAll()) {
+            try (ForEachKeyValue kv = store.scanAll(defaultKind)) {
                 kv.forEachRemaining(new BiConsumer<byte[], byte[]>() {
                     @Override
                     public void accept(byte[] key, byte[] value) {

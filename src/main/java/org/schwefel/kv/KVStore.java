@@ -411,75 +411,82 @@ public final class KVStore implements StoreOps, KindManagement {
     }
 
     @Override
-    public synchronized ForEachKeyValue scanAll() {
+    public synchronized ForEachKeyValue scanAll(Kind kind) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         validateOpen();
-        RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
+        RocksIterator it = Objects.requireNonNull(txnDb.newIterator(((KindImpl) kind).handle()));
         stats.incOpenCursorsCount();
         it.seekToFirst();
         return new ForEachAll(it, stats, this);
     }
 
     @Override
-    public synchronized ForEachKeyValue scanAll(byte[] beginKey) {
+    public synchronized ForEachKeyValue scanAll(Kind kind, byte[] beginKey) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(beginKey, "beginKey cannot be null");
         validateOpen();
-        RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
+        RocksIterator it = Objects.requireNonNull(txnDb.newIterator(((KindImpl) kind).handle()));
         stats.incOpenCursorsCount();
         it.seek(beginKey);
         return new ForEachAll(it, stats, this);
     }
 
     @Override
-    public synchronized ForEachKeyValue scanRange(byte[] beginKey, byte[] endKey) {
+    public synchronized ForEachKeyValue scanRange(Kind kind, byte[] beginKey, byte[] endKey) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(beginKey, "beginKey cannot be null");
         Objects.requireNonNull(endKey, "endKey cannot be null");
         validateOpen();
-        RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
+        RocksIterator it = Objects.requireNonNull(txnDb.newIterator(((KindImpl) kind).handle()));
         stats.incOpenCursorsCount();
         it.seek(beginKey);
         return new ForEachRange(it, endKey, stats, this);
     }
 
     @Override
-    public synchronized byte[] findMinKey(byte[] keyPrefix) {
+    public synchronized byte[] findMinKey(Kind kind, byte[] keyPrefix) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(keyPrefix, "keyPrefix cannot be null");
         validateOpen();
-        RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
+        RocksIterator it = Objects.requireNonNull(txnDb.newIterator(((KindImpl) kind).handle()));
         stats.incOpenCursorsCount();
         return MinMaxKeyIt.findMinKey(it, stats, keyPrefix);
     }
 
     @Override
-    public synchronized byte[] findMaxKey(byte[] keyPrefix) {
+    public synchronized byte[] findMaxKey(Kind kind, byte[] keyPrefix) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(keyPrefix, "keyPrefix cannot be null");
         validateOpen();
-        RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
+        RocksIterator it = Objects.requireNonNull(txnDb.newIterator(((KindImpl) kind).handle()));
         stats.incOpenCursorsCount();
         return MinMaxKeyIt.findMaxKey(it, stats, keyPrefix);
     }
 
     @Override
-    public synchronized byte[] findMaxKeyLessThan(byte[] keyPrefix, byte[] upperBound) {
+    public synchronized byte[] findMaxKeyLessThan(Kind kind, byte[] keyPrefix, byte[] upperBound) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(keyPrefix, "keyPrefix cannot be null");
         Objects.requireNonNull(upperBound, "upperBound cannot be null");
         validateOpen();
         if (keyPrefix.length >= upperBound.length && lexicographicalCompare(keyPrefix, upperBound) > 0) {
             return null;
         }
-        RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
+        RocksIterator it = Objects.requireNonNull(txnDb.newIterator(((KindImpl) kind).handle()));
         stats.incOpenCursorsCount();
         return MinMaxKeyIt.findMaxKeyLessThan(it, stats, keyPrefix, upperBound);
     }
 
     @Override
-    public synchronized byte[] findMinKeyGreaterThan(byte[] keyPrefix, byte[] lowerBound) {
+    public synchronized byte[] findMinKeyGreaterThan(Kind kind, byte[] keyPrefix, byte[] lowerBound) {
+        Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(keyPrefix, "keyPrefix cannot be null");
         Objects.requireNonNull(lowerBound, "lowerBound cannot be null");
         validateOpen();
         if (keyPrefix.length >= lowerBound.length && lexicographicalCompare(keyPrefix, lowerBound) < 0) {
             return null;
         }
-        RocksIterator it = Objects.requireNonNull(txnDb.newIterator());
+        RocksIterator it = Objects.requireNonNull(txnDb.newIterator(((KindImpl) kind).handle()));
         stats.incOpenCursorsCount();
         return MinMaxKeyIt.findMinKeyGreaterThan(it, stats, keyPrefix, lowerBound);
     }
