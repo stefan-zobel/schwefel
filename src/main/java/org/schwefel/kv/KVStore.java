@@ -155,16 +155,19 @@ public final class KVStore implements StoreOps, KindManagement {
 
     @Override
     public KindManagement getKindManagement() {
+        validateOpen();
         return this;
     }
 
     @Override
     public synchronized Set<Kind> getKinds() {
+        validateOpen();
         return new TreeSet<>(kinds.values());
     }
 
     @Override
     public synchronized Kind getKind(String kindName) {
+        validateOpen();
         return kinds.get(kindName);
     }
 
@@ -173,6 +176,7 @@ public final class KVStore implements StoreOps, KindManagement {
         if (Objects.requireNonNull(kindName).isEmpty()) {
             throw new IllegalArgumentException("kindName: ");
         }
+        validateOpen();
         Kind kind = getKind(kindName);
         if (kind == null) {
             kind = (Kind) wrapEx(() -> createKind(kindName));
@@ -190,6 +194,7 @@ public final class KVStore implements StoreOps, KindManagement {
 
     @Override
     public synchronized Kind getDefaultKind() {
+        validateOpen();
         return getKind("default");
     }
 
