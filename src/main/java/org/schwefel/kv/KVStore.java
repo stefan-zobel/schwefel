@@ -126,6 +126,7 @@ public final class KVStore implements StoreOps, KindManagement {
         ignoreEx(() -> syncWAL());
         ignoreEx(() -> flush());
         closeCfHandles();
+        kinds.clear();
         close(txnDb);
         close(txnDbOptions);
         close(txnOpts);
@@ -135,7 +136,6 @@ public final class KVStore implements StoreOps, KindManagement {
         close(flushOptions);
         close(flushOptionsNoWait);
         close(options);
-        kinds.clear();
         txnDb = null;
         txnDbOptions = null;
         txnOpts = null;
