@@ -104,7 +104,7 @@ public final class KVStore implements StoreOps, KindManagement {
                 cfDescs.add(new ColumnFamilyDescriptor(cfName, columnFamilyOptions));
             }
             if (cfDescs.isEmpty()) {
-                cfDescs.add(new ColumnFamilyDescriptor(new byte[] { 'd', 'e', 'f', 'a', 'u', 'l', 't' },
+                cfDescs.add(new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY,
                         columnFamilyOptions));
             }
             ArrayList<ColumnFamilyHandle> cfHandles = new ArrayList<>(cfDescs.size());
