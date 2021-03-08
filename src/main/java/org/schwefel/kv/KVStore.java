@@ -41,8 +41,11 @@ import org.rocksdb.Transaction;
 import org.rocksdb.TransactionDB;
 import org.rocksdb.TransactionDBOptions;
 import org.rocksdb.TransactionOptions;
+import org.rocksdb.UInt64AddOperator;
 import org.rocksdb.WriteBatch;
 import org.rocksdb.WriteOptions;
+
+import net.volcanite.util.LittleEndianLong;
 
 import static org.schwefel.kv.LexicographicByteArrayComparator.lexicographicalCompare;
 
@@ -67,6 +70,7 @@ public final class KVStore implements StoreOps, KindManagement {
     private ReadOptions readOptions;
     private FlushOptions flushOptions;
     private FlushOptions flushOptionsNoWait;
+    private UInt64AddOperator mergeOperator;
     private final HashMap<String, KindImpl> kinds = new HashMap<>(); 
     private final String path;
     private final Stats stats = new Stats();
@@ -82,7 +86,9 @@ public final class KVStore implements StoreOps, KindManagement {
         options.setCreateIfMissing(true);
         options.setErrorIfExists(false);
         options.setIncreaseParallelism(Math.max(Runtime.getRuntime().availableProcessors(), 2));
+        mergeOperator = new UInt64AddOperator();
         columnFamilyOptions = new ColumnFamilyOptions();
+        columnFamilyOptions.setMergeOperator(mergeOperator);
         writeOptions = new WriteOptions();
         readOptions = new ReadOptions();
         flushOptions = new FlushOptions();
@@ -130,6 +136,7 @@ public final class KVStore implements StoreOps, KindManagement {
         close(txnDb);
         close(txnDbOptions);
         close(txnOpts);
+        close(mergeOperator);
         close(columnFamilyOptions);
         close(writeOptions);
         close(readOptions);
@@ -139,6 +146,7 @@ public final class KVStore implements StoreOps, KindManagement {
         txnDb = null;
         txnDbOptions = null;
         txnOpts = null;
+        mergeOperator = null;
         columnFamilyOptions = null;
         writeOptions = null;
         readOptions = null;
@@ -509,6 +517,46 @@ public final class KVStore implements StoreOps, KindManagement {
     @Override
     public synchronized Stats getStats() {
         return stats;
+    }
+
+    synchronized void incrementSeq(ColumnFamilyHandle cfHandle, byte[] key) throws RocksDBException {
+        long start = System.nanoTime();
+        validateOpen();
+        try (Transaction txn = txnDb.beginTransaction(writeOptions, txnOpts)) {
+            txn.merge(cfHandle, key, LittleEndianLong.one());
+            txn.commit();
+            stats.mergeTimeNanos.accept(System.nanoTime() - start);
+            occasionalWalSync();
+            stats.allOpsTimeNanos.accept(System.nanoTime() - start);
+        }
+    }
+
+    synchronized byte[] incrementAndGetSeq(ColumnFamilyHandle cfHandle, byte[] key) throws RocksDBException {
+        long start = System.nanoTime();
+        validateOpen();
+        try (Transaction txn = txnDb.beginTransaction(writeOptions, txnOpts)) {
+            txn.merge(cfHandle, key, LittleEndianLong.one());
+            stats.mergeTimeNanos.accept(System.nanoTime() - start);
+            long startGet = System.nanoTime();
+            byte[] next = txn.get(cfHandle, readOptions, key);
+            stats.getTimeNanos.accept(System.nanoTime() - startGet);
+            txn.commit();
+            occasionalWalSync();
+            stats.allOpsTimeNanos.accept(System.nanoTime() - start);
+            return next;
+        }
+    }
+
+    synchronized byte[] getSeq(ColumnFamilyHandle cfHandle, byte[] key) throws RocksDBException {
+        long start = System.nanoTime();
+        validateOpen();
+        try {
+            return txnDb.get(cfHandle, readOptions, key);
+        } finally {
+            long duration = System.nanoTime() - start;
+            stats.getTimeNanos.accept(duration);
+            stats.allOpsTimeNanos.accept(duration);
+        }
     }
 
     private static void close(AutoCloseable ac) {
