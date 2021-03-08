@@ -48,7 +48,13 @@ final class KindImpl implements Kind {
 
     @Override
     public boolean equals(Object obj) {
-        return handle.equals(obj);
+        if (obj == this) {
+            return true;
+        }
+        if (obj instanceof KindImpl) {
+            return handle.equals(((KindImpl) obj).handle);
+        }
+        return false;
     }
 
     @Override
