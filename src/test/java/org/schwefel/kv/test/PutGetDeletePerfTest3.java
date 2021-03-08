@@ -18,7 +18,8 @@ public class PutGetDeletePerfTest3 {
 
     public static void main(String[] args) {
         Byte4Key gen = new Byte4Key();
-        int RUNS = 100_000;
+        Byte4Key gen2 = null;
+        int RUNS = 500_000;
         long runtime = 0L;
 
         try (StoreOps store = new KVStore(Paths.get("D:/Temp/rocksdb_database"))) {
@@ -30,7 +31,14 @@ public class PutGetDeletePerfTest3 {
 
                 store.put(defaultKind, key, value);
                 byte[] valueRead = store.get(defaultKind, key);
-                byte[] key2 = store.findMinKey(defaultKind, new byte[] { key[0] });
+                byte[] key2 = null;
+                if (i == 0) {
+                    key2 = store.findMinKey(defaultKind, new byte[] { key[0] });
+                    gen2 = new Byte4Key(key2);
+                    gen2.next();
+                } else {
+                    key2 = gen2.next();
+                }
                 store.delete(defaultKind, key2);
                 runtime += (System.currentTimeMillis() - start);
 
@@ -41,7 +49,8 @@ public class PutGetDeletePerfTest3 {
                     throw new RuntimeException("Unexpected: value != valueRead");
                 }
                 if (!Arrays.equals(key, key2)) {
-                    throw new RuntimeException("Unexpected: key != key2");
+                    throw new RuntimeException(
+                            i + " Unexpected: key != key2: " + Arrays.toString(key) + " , " + Arrays.toString(key2));
                 }
             }
 
@@ -61,10 +70,10 @@ public class PutGetDeletePerfTest3 {
                 "write>  avg: " + round(writeTimeNanos.getAverage() / 1_000_000.0) + ", n: " + writeTimeNanos.getCount()
                         + ", std: " + round(writeTimeNanos.getStandardDeviation() / 1_000_000.0) + ", min: "
                         + writeTimeNanos.getMin() / 1_000_000.0 + ", max: " + writeTimeNanos.getMax() / 1_000_000.0);
-        System.out.println(
-                "delet>  avg: " + round(deleteTimeNanos.getAverage() / 1_000_000.0) + ", n: " + deleteTimeNanos.getCount()
-                        + ", std: " + round(deleteTimeNanos.getStandardDeviation() / 1_000_000.0) + ", min: "
-                        + deleteTimeNanos.getMin() / 1_000_000.0 + ", max: " + deleteTimeNanos.getMax() / 1_000_000.0);
+        System.out.println("delet>  avg: " + round(deleteTimeNanos.getAverage() / 1_000_000.0) + ", n: "
+                + deleteTimeNanos.getCount() + ", std: " + round(deleteTimeNanos.getStandardDeviation() / 1_000_000.0)
+                + ", min: " + deleteTimeNanos.getMin() / 1_000_000.0 + ", max: "
+                + deleteTimeNanos.getMax() / 1_000_000.0);
         System.out.println(
                 "fsync>  avg: " + round(fsyncTimeNanos.getAverage() / 1_000_000.0) + ", n: " + fsyncTimeNanos.getCount()
                         + ", std: " + round(fsyncTimeNanos.getStandardDeviation() / 1_000_000.0) + ", min: "
