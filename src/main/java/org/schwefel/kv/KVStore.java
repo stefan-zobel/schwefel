@@ -49,7 +49,7 @@ import net.volcanite.util.LittleEndianLong;
 
 import static org.schwefel.kv.LexicographicByteArrayComparator.lexicographicalCompare;
 
-public final class KVStore implements StoreOps, KindManagement {
+public final class KVStore implements StoreOps, KindManagement, SequenceManagement {
 
     private static final long FLUSH_TIME_WINDOW_MILLIS = 985L;
     private static final long FLUSH_BATCH_SIZE = 20_000L;
@@ -163,6 +163,12 @@ public final class KVStore implements StoreOps, KindManagement {
 
     @Override
     public KindManagement getKindManagement() {
+        validateOpen();
+        return this;
+    }
+
+    @Override
+    public SequenceManagement getSequenceManagement() {
         validateOpen();
         return this;
     }
@@ -519,6 +525,40 @@ public final class KVStore implements StoreOps, KindManagement {
         return stats;
     }
 
+    @Override
+    public synchronized Sequence getSequence(Kind kind, String identifier) {
+        checkIdentifier(identifier);
+        validateOpen();
+        byte[] value = get(kind, identifier.getBytes(UTF8));
+        if (value != null) {
+            return new SequenceImpl((KindImpl) kind, identifier, this);
+        }
+        return null;
+    }
+
+    @Override
+    public synchronized Sequence getOrCreateSequence(Kind kind, String identifier) {
+        Sequence seq = getSequence(kind, identifier);
+        if (seq == null) {
+            put(kind, identifier.getBytes(UTF8), LittleEndianLong.zero());
+            seq = new SequenceImpl((KindImpl) kind, identifier, this);
+        }
+        return seq;
+    }
+
+    @Override
+    public synchronized Sequence resetSequence(Sequence sequence, long newStartValue) {
+        validateOpen();
+        put(sequence.kind(), ((SequenceImpl) sequence).key, LittleEndianLong.getBytes(newStartValue));
+        return sequence;
+    }
+
+    private static void checkIdentifier(String identifier) {
+        if (Objects.requireNonNull(identifier).isEmpty()) {
+            throw new IllegalArgumentException("identifier: ");
+        }
+    }
+
     synchronized void incrementSeq(ColumnFamilyHandle cfHandle, byte[] key) throws RocksDBException {
         long start = System.nanoTime();
         validateOpen();
@@ -536,14 +576,14 @@ public final class KVStore implements StoreOps, KindManagement {
         validateOpen();
         try (Transaction txn = txnDb.beginTransaction(writeOptions, txnOpts)) {
             txn.merge(cfHandle, key, LittleEndianLong.one());
-            stats.mergeTimeNanos.accept(System.nanoTime() - start);
-            long startGet = System.nanoTime();
-            byte[] next = txn.get(cfHandle, readOptions, key);
-            stats.getTimeNanos.accept(System.nanoTime() - startGet);
             txn.commit();
+            stats.mergeTimeNanos.accept(System.nanoTime() - start);
+        }
+        try {
+            return getSeq_(cfHandle, key);
+        } finally {
             occasionalWalSync();
             stats.allOpsTimeNanos.accept(System.nanoTime() - start);
-            return next;
         }
     }
 
@@ -551,11 +591,18 @@ public final class KVStore implements StoreOps, KindManagement {
         long start = System.nanoTime();
         validateOpen();
         try {
+            return getSeq_(cfHandle, key);
+        } finally {
+            stats.allOpsTimeNanos.accept(System.nanoTime() - start);
+        }
+    }
+
+    private byte[] getSeq_(ColumnFamilyHandle cfHandle, byte[] key) throws RocksDBException {
+        long start = System.nanoTime();
+        try {
             return txnDb.get(cfHandle, readOptions, key);
         } finally {
-            long duration = System.nanoTime() - start;
-            stats.getTimeNanos.accept(duration);
-            stats.allOpsTimeNanos.accept(duration);
+            stats.getTimeNanos.accept(System.nanoTime() - start);
         }
     }
 

@@ -28,7 +28,7 @@ final class SequenceImpl implements Sequence {
 
     private final KindImpl kind;
     private final String identifier;
-    private final byte[] key;
+    final byte[] key;
     private final KVStore kvStore;
 
     SequenceImpl(KindImpl kind, String key, KVStore kvStore) {

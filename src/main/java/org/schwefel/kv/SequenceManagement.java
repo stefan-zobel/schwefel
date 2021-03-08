@@ -17,6 +17,7 @@ package org.schwefel.kv;
 
 public interface SequenceManagement {
 
-	Sequence getSequence(Kind kind, String identifier);
-	Sequence createOrReplaceSequence(Kind kind, String identifier);
+    Sequence getSequence(Kind kind, String identifier);
+    Sequence getOrCreateSequence(Kind kind, String identifier);
+    Sequence resetSequence(Sequence sequence, long newStartValue);
 }
