@@ -81,6 +81,7 @@ public final class KVStore implements StoreOps, KindManagement {
         options = new DBOptions();
         options.setCreateIfMissing(true);
         options.setErrorIfExists(false);
+        options.setKeepLogFileNum(2);
         options.setIncreaseParallelism(Math.max(Runtime.getRuntime().availableProcessors(), 2));
         columnFamilyOptions = new ColumnFamilyOptions();
         writeOptions = new WriteOptions();
