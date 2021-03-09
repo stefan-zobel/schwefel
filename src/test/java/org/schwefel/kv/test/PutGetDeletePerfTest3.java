@@ -19,7 +19,7 @@ public class PutGetDeletePerfTest3 {
     public static void main(String[] args) {
         Byte4Key gen = new Byte4Key();
         Byte4Key gen2 = null;
-        int RUNS = 500_000;
+        int RUNS = 1_000_000;
         long runtime = 0L;
 
         try (StoreOps store = new KVStore(Paths.get("D:/Temp/rocksdb_database"))) {
@@ -35,6 +35,7 @@ public class PutGetDeletePerfTest3 {
                 if (i == 0) {
                     key2 = store.findMinKey(defaultKind, new byte[] { key[0] });
                     gen2 = new Byte4Key(key2);
+                    System.out.println(gen2);
                     gen2.next();
                 } else {
                     key2 = gen2.next();

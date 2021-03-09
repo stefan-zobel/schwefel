@@ -1,5 +1,6 @@
 package net.volcanite.util;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -64,6 +65,10 @@ public final class Byte8Key {
 
     public long currentValue() {
         return curr;
+    }
+
+    public String toString() {
+        return Arrays.toString(current());
     }
 
     private static byte[] create(long val) {
