@@ -31,11 +31,12 @@ public interface StoreOps extends BasicOps, AutoCloseable {
     ForEachKeyValue scanRange(Kind kind, byte[] beginKey, byte[] endKey);
     byte[] findMinKey(Kind kind);
     byte[] findMinKeyByPrefix(Kind kind, byte[] keyPrefix);
+    byte[] findMinKeyByLowerBound(Kind kind, byte[] lowerBound);
+    byte[] findMinKeyGreaterThan(Kind kind, byte[] keyPrefix, byte[] lowerBound);
     byte[] findMaxKey(Kind kind);
     byte[] findMaxKeyByPrefix(Kind kind, byte[] keyPrefix);
-    byte[] findMinKeyByLowerBound(Kind kind, byte[] lowerBound);
+    byte[] findMaxKeyByUpperBound(Kind kind, byte[] upperBound);
     byte[] findMaxKeyLessThan(Kind kind, byte[] keyPrefix, byte[] upperBound);
-    byte[] findMinKeyGreaterThan(Kind kind, byte[] keyPrefix, byte[] lowerBound);
     Tx startTx();
     void syncWAL();
     boolean isOpen();

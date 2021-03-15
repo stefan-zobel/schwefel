@@ -33,7 +33,7 @@ public class PutGetDeletePerfTest3 {
                 byte[] valueRead = store.get(defaultKind, key);
                 byte[] key2 = null;
                 if (i == 0) {
-                    key2 = store.findMinKeyByPrefix(defaultKind, new byte[] { key[0] });
+                    key2 = store.findMinKey(defaultKind);
                     gen2 = new Byte4Key(key2);
                     System.out.println(gen2);
                     gen2.next();

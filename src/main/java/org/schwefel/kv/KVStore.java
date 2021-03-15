@@ -37,7 +37,6 @@ import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
-import org.rocksdb.Slice;
 import org.rocksdb.Transaction;
 import org.rocksdb.TransactionDB;
 import org.rocksdb.TransactionDBOptions;
@@ -490,32 +489,19 @@ public final class KVStore implements StoreOps, KindManagement {
     }
 
     @Override
-    public synchronized byte[] findMinKeyByLowerBound(Kind kind, byte[] lowerBound) { // XXX
+    public synchronized byte[] findMinKeyByLowerBound(Kind kind, byte[] lowerBound) {
         Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(lowerBound, "lowerBound cannot be null");
         validateOpen();
-        Slice slice = new Slice(lowerBound);
-        ReadOptions opt = new ReadOptions();
-        opt.setIterateLowerBound(slice);
-        opt.setIterateUpperBound(null);
-        // TODO Auto-generated method stub
-        RocksIterator it = Objects.requireNonNull(txnDb.newIterator(((KindImpl) kind).handle(), opt));
-        stats.incOpenCursorsCount();
-        byte[] key = null;
-        if (it.isOwningHandle()) {
-            it.seekToFirst();
-            if (it.isValid()) {
-                key = it.key();
-            }
-        }
-        if (it.isOwningHandle()) {
-            it.close();
-            stats.decOpenCursorsCount();
-        }
-        // TODO Auto-generated method stub
-        opt.close();
-        slice.close();
-        return key;
+        return MinMaxKeyIt.findMinKeyByLowerBound(txnDb, ((KindImpl) kind).handle(), stats, lowerBound);
+    }
+
+    @Override
+    public synchronized byte[] findMaxKeyByUpperBound(Kind kind, byte[] upperBound) {
+        Objects.requireNonNull(kind, "kind cannot be null");
+        Objects.requireNonNull(upperBound, "upperBound cannot be null");
+        validateOpen();
+        return MinMaxKeyIt.findMaxKeyByUpperBound(txnDb, ((KindImpl) kind).handle(), stats, upperBound);
     }
 
     @Override
