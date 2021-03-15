@@ -74,6 +74,23 @@ final class MinMaxKeyIt {
         }
     }
 
+    static byte[] findMinKey(RocksIterator iter, Stats stats) {
+        try {
+            if (iter.isOwningHandle()) {
+                iter.seekToFirst();
+                if (iter.isValid()) {
+                    return iter.key();
+                }
+            }
+            return null;
+        } finally {
+            if (iter.isOwningHandle()) {
+                iter.close();
+                stats.decOpenCursorsCount();
+            }
+        }
+    }
+
     static byte[] findMinKey(RocksIterator iter, Stats stats, byte[] keyPrefix) {
         try {
             if (iter.isOwningHandle()) {
@@ -83,6 +100,23 @@ final class MinMaxKeyIt {
                     if (keyStartsWithPrefix(key, keyPrefix)) {
                         return key;
                     }
+                }
+            }
+            return null;
+        } finally {
+            if (iter.isOwningHandle()) {
+                iter.close();
+                stats.decOpenCursorsCount();
+            }
+        }
+    }
+
+    static byte[] findMaxKey(RocksIterator iter, Stats stats) {
+        try {
+            if (iter.isOwningHandle()) {
+                iter.seekToLast();
+                if (iter.isValid()) {
+                    return iter.key();
                 }
             }
             return null;
