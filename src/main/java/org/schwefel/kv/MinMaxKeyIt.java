@@ -19,6 +19,7 @@ import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksIterator;
 import org.rocksdb.Slice;
+import org.rocksdb.Transaction;
 import org.rocksdb.TransactionDB;
 
 import static org.schwefel.kv.LexicographicByteArrayComparator.lexicographicalCompare;
@@ -190,6 +191,58 @@ final class MinMaxKeyIt {
             opt.setIterateLowerBound(null);
             opt.setIterateUpperBound(slice);
             RocksIterator iter = Objects.requireNonNull(txnDb.newIterator(cfHandle, opt));
+            try {
+                stats.incOpenCursorsCount();
+                if (iter.isOwningHandle()) {
+                    iter.seekToLast();
+                    if (iter.isValid()) {
+                        return iter.key();
+                    }
+                }
+                return null;
+            } finally {
+                if (iter.isOwningHandle()) {
+                    iter.close();
+                    stats.decOpenCursorsCount();
+                }
+            }
+        }
+        //@formatter:on
+    }
+
+    static byte[] findMinKeyByLowerBound(Transaction txn, ColumnFamilyHandle cfHandle, Stats stats, byte[] lowerBound) {
+        //@formatter:off
+        try (Slice slice = new Slice(lowerBound);
+             ReadOptions opt = new ReadOptions()) {
+            opt.setIterateLowerBound(slice);
+            opt.setIterateUpperBound(null);
+            RocksIterator iter = Objects.requireNonNull(txn.getIterator(opt, cfHandle));
+            try {
+                stats.incOpenCursorsCount();
+                if (iter.isOwningHandle()) {
+                    iter.seekToFirst();
+                    if (iter.isValid()) {
+                        return iter.key();
+                    }
+                }
+                return null;
+            } finally {
+                if (iter.isOwningHandle()) {
+                    iter.close();
+                    stats.decOpenCursorsCount();
+                }
+            }
+        }
+        //@formatter:on
+    }
+
+    static byte[] findMaxKeyByUpperBound(Transaction txn, ColumnFamilyHandle cfHandle, Stats stats, byte[] upperBound) {
+        //@formatter:off
+        try (Slice slice = new Slice(upperBound);
+             ReadOptions opt = new ReadOptions()) {
+            opt.setIterateLowerBound(null);
+            opt.setIterateUpperBound(slice);
+            RocksIterator iter = Objects.requireNonNull(txn.getIterator(opt, cfHandle));
             try {
                 stats.incOpenCursorsCount();
                 if (iter.isOwningHandle()) {

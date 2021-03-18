@@ -214,6 +214,14 @@ class Transactional implements Tx {
     }
 
     @Override
+    public synchronized byte[] findMinKeyByLowerBound(Kind kind, byte[] lowerBound) {
+        Objects.requireNonNull(kind, "kind cannot be null");
+        Objects.requireNonNull(lowerBound, "lowerBound cannot be null");
+        validateOwned();
+        return MinMaxKeyIt.findMinKeyByLowerBound(txn, ((KindImpl) kind).handle(), stats, lowerBound);
+    }
+
+    @Override
     public synchronized byte[] findMaxKey(Kind kind) {
         Objects.requireNonNull(kind, "kind cannot be null");
         validateOwned();
@@ -232,6 +240,14 @@ class Transactional implements Tx {
         RocksIterator it = Objects.requireNonNull(txn.getIterator(readOptions, ((KindImpl) kind).handle()));
         stats.incOpenCursorsCount();
         return MinMaxKeyIt.findMaxKey(it, stats, keyPrefix);
+    }
+
+    @Override
+    public synchronized byte[] findMaxKeyByUpperBound(Kind kind, byte[] upperBound) {
+        Objects.requireNonNull(kind, "kind cannot be null");
+        Objects.requireNonNull(upperBound, "upperBound cannot be null");
+        validateOwned();
+        return MinMaxKeyIt.findMaxKeyByUpperBound(txn, ((KindImpl) kind).handle(), stats, upperBound);
     }
 
     @Override
