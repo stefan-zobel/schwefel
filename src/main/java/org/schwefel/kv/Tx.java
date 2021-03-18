@@ -40,8 +40,8 @@ public interface Tx extends BasicOps, AutoCloseable {
     ForEachKeyValue scanAll(Kind kind);
     ForEachKeyValue scanAll(Kind kind, byte[] beginKey);
     ForEachKeyValue scanRange(Kind kind, byte[] beginKey, byte[] endKey);
-    byte[] findMinKey(Kind kind, byte[] keyPrefix);
-    byte[] findMaxKey(Kind kind, byte[] keyPrefix);
-    byte[] findMaxKeyLessThan(Kind kind, byte[] keyPrefix, byte[] upperBound);
+    byte[] findMinKeyByPrefix(Kind kind, byte[] keyPrefix);
     byte[] findMinKeyGreaterThan(Kind kind, byte[] keyPrefix, byte[] lowerBound);
+    byte[] findMaxKeyByPrefix(Kind kind, byte[] keyPrefix);
+    byte[] findMaxKeyLessThan(Kind kind, byte[] keyPrefix, byte[] upperBound);
 }

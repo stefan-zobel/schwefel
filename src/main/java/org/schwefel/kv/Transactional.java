@@ -193,7 +193,7 @@ class Transactional implements Tx {
     }
 
     @Override
-    public synchronized byte[] findMinKey(Kind kind, byte[] keyPrefix) {
+    public synchronized byte[] findMinKeyByPrefix(Kind kind, byte[] keyPrefix) {
         Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(keyPrefix, "keyPrefix cannot be null");
         validateOwned();
@@ -204,7 +204,7 @@ class Transactional implements Tx {
     }
 
     @Override
-    public synchronized byte[] findMaxKey(Kind kind, byte[] keyPrefix) {
+    public synchronized byte[] findMaxKeyByPrefix(Kind kind, byte[] keyPrefix) {
         Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(keyPrefix, "keyPrefix cannot be null");
         validateOwned();
