@@ -66,6 +66,10 @@ public final class Byte4Key {
         return curr;
     }
 
+    public int minus(Byte4Key other) {
+        return curr - Objects.requireNonNull(other, "other").curr;
+    }
+
     public String toString() {
         return Arrays.toString(current());
     }
