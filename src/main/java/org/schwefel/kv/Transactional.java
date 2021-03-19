@@ -369,6 +369,22 @@ class Transactional implements Tx {
     }
 
     @Override
+    public synchronized byte[] singleDeleteIfPresent(Kind kind, byte[] key) {
+        Objects.requireNonNull(kind, "kind cannot be null");
+        Objects.requireNonNull(key, "key cannot be null");
+        validateOwned();
+        byte[] oldVal = null;
+        try {
+            if ((oldVal = get(kind, key)) != null) {
+                txn.singleDelete(((KindImpl) kind).handle(), key);
+            }
+        } catch (RocksDBException e) {
+            throw new StoreException(e);
+        }
+        return oldVal;
+    }
+
+    @Override
     public synchronized byte[] updateIfPresent(Kind kind, byte[] key, byte[] value) {
         Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
