@@ -275,6 +275,25 @@ public final class KVStore implements StoreOps, KindManagement {
     }
 
     @Override
+    public synchronized byte[] singleDeleteIfPresent(Kind kind, byte[] key) {
+        long start = System.nanoTime();
+        Objects.requireNonNull(kind, "kind cannot be null");
+        Objects.requireNonNull(key, "key cannot be null");
+        validateOpen();
+        byte[] oldVal = null;
+        try {
+            if ((oldVal = get_(kind, key)) != null) {
+                singleDelete_(kind, key);
+            }
+        } catch (RocksDBException e) {
+            throw new StoreException(e);
+        } finally {
+            stats.allOpsTimeNanos.accept(System.nanoTime() - start);
+        }
+        return oldVal;
+    }
+
+    @Override
     public synchronized byte[] updateIfPresent(Kind kind, byte[] key, byte[] value) {
         long start = System.nanoTime();
         Objects.requireNonNull(kind, "kind cannot be null");
@@ -336,6 +355,31 @@ public final class KVStore implements StoreOps, KindManagement {
         long delStart = System.nanoTime();
         try (Transaction txn = txnDb.beginTransaction(writeOptions, txnOpts)) {
             txn.delete(((KindImpl) kind).handle(), key);
+            txn.commit();
+            stats.deleteTimeNanos.accept(System.nanoTime() - delStart);
+            occasionalWalSync();
+        }
+    }
+
+    @Override
+    public synchronized void singleDelete(Kind kind, byte[] key) {
+        long start = System.nanoTime();
+        Objects.requireNonNull(kind, "kind cannot be null");
+        Objects.requireNonNull(key, "key cannot be null");
+        validateOpen();
+        try {
+            singleDelete_(kind, key);
+        } catch (RocksDBException e) {
+            throw new StoreException(e);
+        } finally {
+            stats.allOpsTimeNanos.accept(System.nanoTime() - start);
+        }
+    }
+
+    private void singleDelete_(Kind kind, byte[] key) throws RocksDBException {
+        long delStart = System.nanoTime();
+        try (Transaction txn = txnDb.beginTransaction(writeOptions, txnOpts)) {
+            txn.singleDelete(((KindImpl) kind).handle(), key);
             txn.commit();
             stats.deleteTimeNanos.accept(System.nanoTime() - delStart);
             occasionalWalSync();
