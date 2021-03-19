@@ -71,6 +71,30 @@ public final class Byte8Key {
         return Arrays.toString(current());
     }
 
+    @Override
+    public int hashCode() {
+        int h = 0x7FFFF + (int) (curr ^ (curr >>> 32));
+        return Hash.hash32((h << 19) - h);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Byte8Key other = (Byte8Key) obj;
+        if (curr == other.curr) {
+            return true;
+        }
+        return false;
+    }
+
     private static byte[] create(long val) {
         return putLongB(val, new byte[8]);
     }

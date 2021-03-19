@@ -70,6 +70,30 @@ public final class Byte4Key {
         return Arrays.toString(current());
     }
 
+    @Override
+    public int hashCode() {
+        int h = 0x7FFFF + curr;
+        return Hash.hash32((h << 19) - h);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Byte4Key other = (Byte4Key) obj;
+        if (curr == other.curr) {
+            return true;
+        }
+        return false;
+    }
+
     private static byte[] create(int val) {
         return putIntB(val, new byte[4]);
     }
