@@ -67,6 +67,10 @@ public final class Byte8Key {
         return curr;
     }
 
+    public void increment() {
+        ++curr;
+    }
+
     public void decrement() {
         --curr;
     }

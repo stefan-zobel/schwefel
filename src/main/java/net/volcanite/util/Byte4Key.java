@@ -66,6 +66,10 @@ public final class Byte4Key {
         return curr;
     }
 
+    public void increment() {
+        ++curr;
+    }
+
     public void decrement() {
         --curr;
     }
