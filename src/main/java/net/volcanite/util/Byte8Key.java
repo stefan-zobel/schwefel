@@ -67,6 +67,10 @@ public final class Byte8Key {
         return curr;
     }
 
+    public void decrement() {
+        --curr;
+    }
+
     public long minus(Byte8Key other) {
         return curr - Objects.requireNonNull(other, "other").curr;
     }
