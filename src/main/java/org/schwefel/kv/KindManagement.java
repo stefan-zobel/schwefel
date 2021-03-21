@@ -23,4 +23,6 @@ public interface KindManagement {
     Kind getKind(String kindName);
     Kind getOrCreateKind(String kindName);
     Kind getDefaultKind();
+    void compact(String kindName);
+    void compactAll();
 }

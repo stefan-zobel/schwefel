@@ -155,6 +155,8 @@ public final class KVStore implements StoreOps, KindManagement {
         }
     }
 
+    // KindManagement
+
     @Override
     public KindManagement getKindManagement() {
         validateOpen();
@@ -199,6 +201,36 @@ public final class KVStore implements StoreOps, KindManagement {
         validateOpen();
         return getKind("default");
     }
+
+    @Override
+    public synchronized void compact(String kindName) {
+        if (Objects.requireNonNull(kindName).isEmpty()) {
+            throw new IllegalArgumentException("kindName: ");
+        }
+        validateOpen();
+        Kind kind = getKind(kindName);
+        if (kind != null) {
+            compact_(kind);
+        }
+    }
+
+    @Override
+    public synchronized void compactAll() {
+        validateOpen();
+        for (KindImpl kind : kinds.values()) {
+            compact_(kind);
+        }
+    }
+
+    private void compact_(Kind kind) {
+        try {
+            txnDb.compactRange(((KindImpl) kind).handle());
+        } catch (RocksDBException e) {
+            throw new StoreException(e);
+        }
+    }
+
+    // StoreOps
 
     @Override
     public synchronized void put(Kind kind, byte[] key, byte[] value) {
