@@ -210,7 +210,7 @@ public final class KVStore implements StoreOps, KindManagement {
         validateOpen();
         Kind kind = getKind(kindName);
         if (kind != null) {
-            compact_(kind);
+            compact_((KindImpl) kind);
         }
     }
 
@@ -222,9 +222,9 @@ public final class KVStore implements StoreOps, KindManagement {
         }
     }
 
-    private void compact_(Kind kind) {
+    private void compact_(KindImpl kind) {
         try {
-            txnDb.compactRange(((KindImpl) kind).handle());
+            txnDb.compactRange(kind.handle());
         } catch (RocksDBException e) {
             throw new StoreException(e);
         }
