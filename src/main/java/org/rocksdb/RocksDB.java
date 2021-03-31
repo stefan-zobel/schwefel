@@ -3577,8 +3577,7 @@ public class RocksDB extends RocksObject {
       final MutableColumnFamilyOptions mutableColumnFamilyOptions)
       throws RocksDBException {
     setOptions(nativeHandle_, columnFamilyHandle == null ? 0 : columnFamilyHandle.nativeHandle_,
-        mutableColumnFamilyOptions.getKeys(),
-        mutableColumnFamilyOptions.getValues());
+        mutableColumnFamilyOptions.getKeys(), mutableColumnFamilyOptions.getValues());
   }
 
   /**
