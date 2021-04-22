@@ -61,13 +61,13 @@ public class RocksDB extends RocksObject {
           if (compressionType.getLibraryName() != null) {
             System.loadLibrary(compressionType.getLibraryName());
           }
-        } catch (UnsatisfiedLinkError e) {
+        } catch (final UnsatisfiedLinkError e) {
           // since it may be optional, we ignore its loading failure here.
         }
       }
       try {
         NativeLibraryLoader.getInstance().loadLibrary(tmpDir);
-      } catch (IOException e) {
+      } catch (final IOException e) {
         libraryLoaded.set(LibraryState.NOT_LOADED);
         throw new RuntimeException("Unable to load the RocksDB shared library",
             e);
@@ -112,7 +112,7 @@ public class RocksDB extends RocksObject {
             System.load(path + "/" + Environment.getSharedLibraryFileName(
                 compressionType.getLibraryName()));
             break;
-          } catch (UnsatisfiedLinkError e) {
+          } catch (final UnsatisfiedLinkError e) {
             // since they are optional, we ignore loading fails.
           }
         }
@@ -125,7 +125,7 @@ public class RocksDB extends RocksObject {
               Environment.getJniLibraryFileName("rocksdbjni"));
           success = true;
           break;
-        } catch (UnsatisfiedLinkError e) {
+        } catch (final UnsatisfiedLinkError e) {
           err = e;
         }
       }
@@ -334,7 +334,7 @@ public class RocksDB extends RocksObject {
       throws RocksDBException {
     // This allows to use the rocksjni default Options instead of
     // the c++ one.
-    Options options = new Options();
+    final Options options = new Options();
     return openReadOnly(options, path);
   }
 
