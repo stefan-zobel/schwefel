@@ -5,7 +5,7 @@
 
 # schwefel
 
-A dead simple RocksDB Java wrapper
+A dead simple [RocksDB](https://github.com/facebook/rocksdb) Java wrapper
 
 
 Status:
