@@ -221,7 +221,7 @@ public abstract class AbstractMutableOptions {
      * @param value the string containing a value which represents a long
      * @return the long value of the parsed string
      */
-    private long parseAsLong(final String value) {
+    private static long parseAsLong(final String value) {
       try {
         return Long.parseLong(value);
       } catch (NumberFormatException nfe) {
@@ -239,7 +239,7 @@ public abstract class AbstractMutableOptions {
      * @param value the string containing a value which represents an int
      * @return the int value of the parsed string
      */
-    private int parseAsInt(final String value) {
+    private static int parseAsInt(final String value) {
       try {
         return Integer.parseInt(value);
       } catch (NumberFormatException nfe) {
@@ -343,9 +343,10 @@ public abstract class AbstractMutableOptions {
         case ENUM:
           final CompressionType compressionType = CompressionType.getFromInternal(valueStr);
           return setEnum(key, compressionType);
-      }
 
-      throw new IllegalStateException(key + " has unknown value type: " + key.getValueType());
+        default:
+          throw new IllegalStateException(key + " has unknown value type: " + key.getValueType());
+      }
     }
 
     /**
