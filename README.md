@@ -20,6 +20,6 @@ Status:
 <dependency>
     <groupId>net.sourceforge.streamsupport</groupId>
     <artifactId>schwefel</artifactId>
-    <version>6.25.3.1</version>
+    <version>6.26.1.1</version>
 </dependency>
 ```
