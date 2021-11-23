@@ -21,8 +21,8 @@ public class TraceOptions {
   }
 
   /**
-   * To avoid the trace file size grows large than the storage space,
-   * user can set the max trace file size in Bytes. Default is 64GB
+   * To avoid the trace file size grows larger than the storage space,
+   * user can set the max trace file size in Bytes. Default is 64 GB.
    *
    * @return the max trace size
    */
