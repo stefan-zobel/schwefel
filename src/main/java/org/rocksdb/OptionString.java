@@ -63,7 +63,7 @@ public class OptionString {
     public final String key;
     public final Value value;
 
-    private Entry(final String key, final Value value) {
+    Entry(final String key, final Value value) {
       this.key = key;
       this.value = value;
     }
@@ -74,6 +74,7 @@ public class OptionString {
   }
 
   static class Parser {
+    @SuppressWarnings("serial")
     static class Exception extends RuntimeException {
       public Exception(final String s) {
         super(s);
