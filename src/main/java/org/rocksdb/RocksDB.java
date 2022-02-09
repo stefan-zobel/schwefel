@@ -5162,7 +5162,7 @@ public class RocksDB extends RocksObject {
       return getMajor() + "." + getMinor() + "." + getPatch();
     }
 
-    private static Version fromEncodedVersion(int encodedVersion) {
+    static Version fromEncodedVersion(int encodedVersion) {
       final byte patch = (byte) (encodedVersion & 0xff);
       encodedVersion >>= 8;
       final byte minor = (byte) (encodedVersion & 0xff);
