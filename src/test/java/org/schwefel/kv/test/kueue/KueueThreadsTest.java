@@ -62,7 +62,7 @@ public class KueueThreadsTest {
         }
 
         byte[] produceRandomData(int counter) {
-            int len = rnd.nextInt(400) + 1;
+            int len = rnd.nextInt(895) + 1;
             int finalLen = len + 8;
             byte[] array = new byte[finalLen];
             int content = rnd.nextInt(127) + 1;
