@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Stefan Zobel
+ * Copyright 2021, 2022 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package org.schwefel.kv.kueue;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * A simple RocksDB-based in-process durable queue.
  */
@@ -22,6 +24,7 @@ public interface Kueue {
 
     void put(byte[] value);
     byte[] take() throws InterruptedException;
+    byte[] take(long timeout, TimeUnit unit) throws InterruptedException;
     boolean accept(KueueMsgConsumer consumer);
     long size();
     boolean isEmpty();

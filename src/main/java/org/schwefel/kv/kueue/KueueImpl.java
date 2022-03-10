@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Stefan Zobel
+ * Copyright 2021, 2022 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.schwefel.kv.kueue;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -151,6 +152,36 @@ import net.volcanite.util.Byte8Key;
         try {
             while (count.get() == 0L) {
                 notEmpty.await();
+            }
+            value = ops.singleDeleteIfPresent(id, minKey.current());
+            if (value != null) {
+                c = count.getAndDecrement();
+            }
+            minKey.increment();
+            if (c > 1L) {
+                // signal other waiting takers
+                notEmpty.signal();
+            }
+        } finally {
+            takeLock.unlock();
+        }
+        return value;
+    }
+
+    @Override
+    public byte[] take(long timeout, TimeUnit unit) throws InterruptedException {
+        byte[] value;
+        long c = -1L;
+        long nanos = unit.toNanos(timeout);
+        ReentrantLock takeLock = this.takeLock;
+        AtomicLong count = this.count;
+        takeLock.lockInterruptibly();
+        try {
+            while (count.get() == 0L) {
+                if (nanos <= 0L) {
+                    return null;
+                }
+                nanos = notEmpty.awaitNanos(nanos);
             }
             value = ops.singleDeleteIfPresent(id, minKey.current());
             if (value != null) {
