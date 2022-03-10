@@ -229,6 +229,41 @@ import net.volcanite.util.Byte8Key;
     }
 
     @Override
+    public boolean accept(long timeout, TimeUnit unit, KueueMsgConsumer consumer) throws InterruptedException {
+        if (consumer == null) {
+            return false;
+        }
+        long nanos = unit.toNanos(timeout);
+        ReentrantLock takeLock = this.takeLock;
+        AtomicLong count = this.count;
+        takeLock.lockInterruptibly();
+        try {
+            while (count.get() == 0L) {
+                if (nanos <= 0L) {
+                    return false;
+                }
+                nanos = notEmpty.awaitNanos(nanos);
+            }
+            byte[] key = minKey.current();
+            byte[] msg = ops.get(id, key);
+            if (msg != null) {
+                if (consumer.accept(msg)) {
+                    ops.singleDelete(id, key);
+                    if (count.getAndDecrement() > 1L) {
+                        // signal other waiting takers
+                        notEmpty.signal();
+                    }
+                    minKey.increment();
+                    return true;
+                }
+            }
+        } finally {
+            takeLock.unlock();
+        }
+        return false;
+    }
+
+    @Override
     public void clear() {
         fullyLock();
         try {

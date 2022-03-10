@@ -26,6 +26,7 @@ public interface Kueue {
     byte[] take() throws InterruptedException;
     byte[] take(long timeout, TimeUnit unit) throws InterruptedException;
     boolean accept(KueueMsgConsumer consumer);
+    boolean accept(long timeout, TimeUnit unit, KueueMsgConsumer consumer) throws InterruptedException;
     long size();
     boolean isEmpty();
     boolean isClosed();
