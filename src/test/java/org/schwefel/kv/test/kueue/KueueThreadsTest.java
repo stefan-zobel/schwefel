@@ -30,6 +30,8 @@ public class KueueThreadsTest {
 
             System.out.println("put & del took: " + (end - start) + " ms");
             System.out.println("average       : " + ((end - start) / (double) MSG_COUNT) + " ms / message");
+            System.out.println("total puts    : " + kueue.totalPuts());
+            System.out.println("total takes   : " + kueue.totalTakes());
             System.out.println("queue size    : " + kueue.size());
             System.out.println("done");
             System.out.flush();

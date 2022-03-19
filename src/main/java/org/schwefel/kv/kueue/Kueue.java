@@ -32,4 +32,6 @@ public interface Kueue {
     boolean isClosed();
     String identifier();
     void clear();
+    long totalPuts();
+    long totalTakes();
 }

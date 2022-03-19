@@ -45,6 +45,10 @@ import net.volcanite.util.Byte8Key;
     private final Condition notEmpty = takeLock.newCondition();
     /** Current number of messages */
     private final AtomicLong count;
+    /** Total number of successful puts */
+    private long totalPuts;
+    /** Total number of successful takes */
+    private long totalTakes;
 
     /* package */ KueueImpl(StoreOps store, String identifier) {
         ops = Objects.requireNonNull(store, "store");
@@ -92,6 +96,16 @@ import net.volcanite.util.Byte8Key;
         return id.name();
     }
 
+    @Override
+    public long totalPuts() {
+        return totalPuts;
+    }
+
+    @Override
+    public long totalTakes() {
+        return totalTakes;
+    }
+
     /**
      * Signals a waiting take. Called only from put.
      */
@@ -131,6 +145,7 @@ import net.volcanite.util.Byte8Key;
         try {
             ops.put(id, maxKey.next(), value);
             c = count.getAndIncrement();
+            ++totalPuts;
         } catch (Throwable t) {
             maxKey.decrement();
             throw t;
@@ -156,6 +171,7 @@ import net.volcanite.util.Byte8Key;
             value = ops.singleDeleteIfPresent(id, minKey.current());
             if (value != null) {
                 c = count.getAndDecrement();
+                ++totalTakes;
             }
             minKey.increment();
             if (c > 1L) {
@@ -186,6 +202,7 @@ import net.volcanite.util.Byte8Key;
             value = ops.singleDeleteIfPresent(id, minKey.current());
             if (value != null) {
                 c = count.getAndDecrement();
+                ++totalTakes;
             }
             minKey.increment();
             if (c > 1L) {
@@ -219,6 +236,7 @@ import net.volcanite.util.Byte8Key;
                         notEmpty.signal();
                     }
                     minKey.increment();
+                    ++totalTakes;
                     return true;
                 }
             }
@@ -254,6 +272,7 @@ import net.volcanite.util.Byte8Key;
                         notEmpty.signal();
                     }
                     minKey.increment();
+                    ++totalTakes;
                     return true;
                 }
             }
@@ -272,6 +291,7 @@ import net.volcanite.util.Byte8Key;
                 byte[] value = ops.singleDeleteIfPresent(id, minKey.current());
                 if (value != null) {
                     count.getAndDecrement();
+                    ++totalTakes;
                 }
                 minKey.increment();
             }
