@@ -34,6 +34,7 @@ import net.volcanite.util.Byte8Key;
     private Byte8Key minKey = new Byte8Key(Byte8Key.minKey());
     private Byte8Key maxKey = new Byte8Key(Byte8Key.minKey());
 
+    private final KueueManager manager;
     private final StoreOps ops;
     private final Kind id;
 
@@ -50,7 +51,8 @@ import net.volcanite.util.Byte8Key;
     /** Total number of successful takes */
     private long totalTakes;
 
-    /* package */ KueueImpl(StoreOps store, String identifier) {
+    /* package */ KueueImpl(StoreOps store, String identifier, KueueManager mgr) {
+        manager = mgr;
         ops = Objects.requireNonNull(store, "store");
         id = store.getKindManagement().getOrCreateKind(Objects.requireNonNull(identifier, "identifier"));
         Byte8Key lastMax = maxKey;
@@ -104,6 +106,11 @@ import net.volcanite.util.Byte8Key;
     @Override
     public long totalTakes() {
         return totalTakes;
+    }
+
+    @Override
+    public KueueManager getKueueManager() {
+        return manager;
     }
 
     /**

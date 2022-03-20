@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Stefan Zobel
+ * Copyright 2021, 2022 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public final class KueueManager implements AutoCloseable {
 
     public Kueue get(String identifier) {
         if (!isClosed()) {
-            return kueues.computeIfAbsent(Objects.requireNonNull(identifier), id -> new KueueImpl(ops, id));
+            return kueues.computeIfAbsent(Objects.requireNonNull(identifier), id -> new KueueImpl(ops, id, this));
         }
         throw new IllegalStateException(KueueManager.class.getName() + " for " + getDirectory() + " is closed");
     }

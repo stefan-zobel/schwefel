@@ -34,4 +34,5 @@ public interface Kueue {
     void clear();
     long totalPuts();
     long totalTakes();
+    KueueManager getKueueManager();
 }
