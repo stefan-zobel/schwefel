@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, 2021 Stefan Zobel
+ * Copyright 2020, 2022 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.schwefel.kv;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -50,7 +50,6 @@ public final class KVStore implements StoreOps, KindManagement {
 
     private static final long FLUSH_TIME_WINDOW_MILLIS = 985L;
     private static final long FLUSH_BATCH_SIZE = 20_000L;
-    private static final Charset UTF8 = Charset.forName("UTF-8");
 
     private static final Logger logger = Logger.getLogger(KVStore.class.getName());
 
@@ -189,8 +188,8 @@ public final class KVStore implements StoreOps, KindManagement {
     }
 
     private Kind createKind(String kindName) throws RocksDBException {
-        ColumnFamilyHandle handle = txnDb
-                .createColumnFamily(new ColumnFamilyDescriptor(kindName.getBytes(UTF8), columnFamilyOptions));
+        ColumnFamilyHandle handle = txnDb.createColumnFamily(
+                new ColumnFamilyDescriptor(kindName.getBytes(StandardCharsets.UTF_8), columnFamilyOptions));
         KindImpl kind = new KindImpl(handle.getName(), handle);
         kinds.put(kind.name(), kind);
         return kind;

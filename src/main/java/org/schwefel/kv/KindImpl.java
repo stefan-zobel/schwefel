@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Stefan Zobel
+ * Copyright 2021, 2022 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,18 @@
  */
 package org.schwefel.kv;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 import org.rocksdb.ColumnFamilyHandle;
 
 final class KindImpl implements Kind {
 
-    private static final Charset UTF8 = Charset.forName("UTF-8");
-
     private final String name;
     private final ColumnFamilyHandle handle;
 
     KindImpl(byte[] name, ColumnFamilyHandle handle) {
-        this.name = new String(Objects.requireNonNull(name), UTF8);
+        this.name = new String(Objects.requireNonNull(name), StandardCharsets.UTF_8);
         this.handle = Objects.requireNonNull(handle);
     }
 
