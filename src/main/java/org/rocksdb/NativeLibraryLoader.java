@@ -106,6 +106,7 @@ public class NativeLibraryLoader {
 
   File loadLibraryFromJarToTemp(final String tmpDir)
           throws IOException {
+    @SuppressWarnings("resource")
     InputStream is = null;
     try {
       // attempt to look up the static library in the jar file
