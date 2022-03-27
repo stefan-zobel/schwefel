@@ -751,7 +751,7 @@ public class ReadOptions extends RocksObject {
    *
    * Default: {@code std::numeric_limits<uint64_t>::max()}
    *
-   * @param valueSizeSofLimit
+   * @param valueSizeSofLimit the maximum cumulative value size of the keys
    * @return the reference to the current ReadOptions
    */
   public ReadOptions setValueSizeSoftLimit(final long valueSizeSofLimit) {
