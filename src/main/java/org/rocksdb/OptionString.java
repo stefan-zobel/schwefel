@@ -63,7 +63,7 @@ public class OptionString {
     public final String key;
     public final Value value;
 
-    Entry(final String key, final Value value) {
+    /*package*/ Entry(final String key, final Value value) {
       this.key = key;
       this.value = value;
     }

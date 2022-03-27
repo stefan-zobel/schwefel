@@ -342,8 +342,7 @@ public interface AdvancedColumnFamilyOptionsInterface<
    * @param compactionStyle Compaction style.
    * @return the reference to the current options.
    */
-  @SuppressWarnings("rawtypes")
-  ColumnFamilyOptionsInterface setCompactionStyle(
+  ColumnFamilyOptionsInterface<?> setCompactionStyle(
       CompactionStyle compactionStyle);
 
   /**
