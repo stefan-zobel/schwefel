@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, 2021 Stefan Zobel
+ * Copyright 2020, 2022 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,18 +139,18 @@ class Transactional implements Tx {
     }
 
     @Override
-    public synchronized byte[][] multiGet(List<Kind> kinds, byte[][] keys) {
+    public synchronized List<byte[]> multiGet(List<Kind> kinds, List<byte[]> keys) {
         Objects.requireNonNull(kinds, "kinds cannot be null");
         Objects.requireNonNull(keys, "keys cannot be null");
-        if (kinds.size() != keys.length) {
+        if (kinds.size() != keys.size()) {
             throw new IllegalArgumentException(
-                    "Each key must have an associated Kind. kinds = " + kinds.size() + " != keys = " + keys.length);
+                    "Each key must have an associated Kind. kinds = " + kinds.size() + " != keys = " + keys.size());
         }
         checkInnerKeys(keys);
         validateOwned();
         validateReadOptions();
         try {
-            return txn.multiGet(readOptions, toCfHandleList(kinds), keys);
+            return txn.multiGetAsList(readOptions, toCfHandleList(kinds), keys);
         } catch (RocksDBException e) {
             throw new StoreException(e);
         }
@@ -299,18 +299,18 @@ class Transactional implements Tx {
     }
 
     @Override
-    public synchronized byte[][] multiGetForUpdate(List<Kind> kinds, byte[][] keys) {
+    public synchronized List<byte[]> multiGetForUpdate(List<Kind> kinds, List<byte[]> keys) {
         Objects.requireNonNull(kinds, "kinds cannot be null");
         Objects.requireNonNull(keys, "keys cannot be null");
-        if (kinds.size() != keys.length) {
+        if (kinds.size() != keys.size()) {
             throw new IllegalArgumentException(
-                    "Each key must have an associated Kind. kinds = " + kinds.size() + " != keys = " + keys.length);
+                    "Each key must have an associated Kind. kinds = " + kinds.size() + " != keys = " + keys.size());
         }
         checkInnerKeys(keys);
         validateOwned();
         validateReadOptions();
         try {
-            return txn.multiGetForUpdate(readOptions, toCfHandleList(kinds), keys);
+            return txn.multiGetForUpdateAsList(readOptions, toCfHandleList(kinds), keys);
         } catch (RocksDBException e) {
             throw new StoreException(e);
         }
@@ -412,9 +412,9 @@ class Transactional implements Tx {
         }
     }
 
-    private static void checkInnerKeys(byte[][] keys) {
-        for (int i = 0; i < keys.length; ++i) {
-            if (keys[i] == null) {
+    private static void checkInnerKeys(List<byte[]> keys) {
+        for (int i = 0; i < keys.size(); ++i) {
+            if (keys.get(i) == null) {
                 throw new NullPointerException("keys[" + i + "] cannot be null");
             }
         }

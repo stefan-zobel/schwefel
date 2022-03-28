@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, 2021 Stefan Zobel
+ * Copyright 2020, 2022 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,10 +28,10 @@ public interface Tx extends BasicOps, AutoCloseable {
     void put(Kind kind, byte[] key, byte[] value);
     void putIfAbsent(Kind kind, byte[] key, byte[] value);
     byte[] get(Kind kind, byte[] key);
-    byte[][] multiGet(List<Kind> kinds, byte[][] keys);
+    List<byte[]> multiGet(List<Kind> kinds, List<byte[]> keys);
     byte[] getForUpdate(Kind kind, byte[] key);
     byte[] getForUpdate(Kind kind, byte[] key, boolean exclusive);
-    byte[][] multiGetForUpdate(List<Kind> kinds, byte[][] keys);
+    List<byte[]> multiGetForUpdate(List<Kind> kinds, List<byte[]> keys);
     void undoGetForUpdate(Kind kind, byte[] key);
     void delete(Kind kind, byte[] key);
     byte[] deleteIfPresent(Kind kind, byte[] key);
