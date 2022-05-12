@@ -2282,10 +2282,11 @@ public class RocksDB extends RocksObject {
    */
   public List<ByteBufferGetStatus> multiGetByteBuffers(
       final List<ByteBuffer> keys, final List<ByteBuffer> values) throws RocksDBException {
-    final ReadOptions readOptions = new ReadOptions();
-    final List<ColumnFamilyHandle> columnFamilyHandleList = new ArrayList<>(1);
-    columnFamilyHandleList.add(getDefaultColumnFamily());
-    return multiGetByteBuffers(readOptions, columnFamilyHandleList, keys, values);
+    try (ReadOptions readOptions = new ReadOptions()) {
+      final List<ColumnFamilyHandle> columnFamilyHandleList = new ArrayList<>(1);
+      columnFamilyHandleList.add(getDefaultColumnFamily());
+      return multiGetByteBuffers(readOptions, columnFamilyHandleList, keys, values);
+    }
   }
 
   /**
@@ -2325,8 +2326,9 @@ public class RocksDB extends RocksObject {
   public List<ByteBufferGetStatus> multiGetByteBuffers(
       final List<ColumnFamilyHandle> columnFamilyHandleList, final List<ByteBuffer> keys,
       final List<ByteBuffer> values) throws RocksDBException {
-    final ReadOptions readOptions = new ReadOptions();
-    return multiGetByteBuffers(readOptions, columnFamilyHandleList, keys, values);
+    try (ReadOptions readOptions = new ReadOptions()) {
+      return multiGetByteBuffers(readOptions, columnFamilyHandleList, keys, values);
+    }
   }
 
   /**
