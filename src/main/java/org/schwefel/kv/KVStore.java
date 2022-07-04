@@ -32,6 +32,7 @@ import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.ColumnFamilyOptions;
 import org.rocksdb.DBOptions;
 import org.rocksdb.FlushOptions;
+import org.rocksdb.InfoLogLevel;
 import org.rocksdb.Options;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDB;
@@ -83,6 +84,7 @@ public final class KVStore implements StoreOps, KindManagement {
         options.setKeepLogFileNum(2);
         options.setDeleteObsoleteFilesPeriodMicros(3600000000L);
         options.setIncreaseParallelism(Math.max(Runtime.getRuntime().availableProcessors(), 2));
+        options.setInfoLogLevel(InfoLogLevel.WARN_LEVEL);
         columnFamilyOptions = new ColumnFamilyOptions();
         writeOptions = new WriteOptions();
         readOptions = new ReadOptions();
