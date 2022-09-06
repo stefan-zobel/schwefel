@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.schwefel.kv.KVStore;
+import org.schwefel.kv.Stats;
 import org.schwefel.kv.StoreOps;
 
 public final class KueueManager implements AutoCloseable {
@@ -52,6 +53,10 @@ public final class KueueManager implements AutoCloseable {
         } catch (IOException ignore) {
         }
         return directory;
+    }
+
+    public Stats getStats() {
+        return ops.getStats();
     }
 
     public boolean isClosed() {
