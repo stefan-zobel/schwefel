@@ -83,6 +83,7 @@ public final class KVStore implements StoreOps, KindManagement {
         options.setErrorIfExists(false);
         options.setKeepLogFileNum(2);
         options.setDeleteObsoleteFilesPeriodMicros(3600000000L);
+        options.setRecycleLogFileNum(10L);
         options.setIncreaseParallelism(Math.max(Runtime.getRuntime().availableProcessors(), 2));
         options.setInfoLogLevel(InfoLogLevel.WARN_LEVEL);
         columnFamilyOptions = new ColumnFamilyOptions();
