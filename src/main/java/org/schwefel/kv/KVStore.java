@@ -87,6 +87,7 @@ public final class KVStore implements StoreOps, KindManagement {
         options.setIncreaseParallelism(Math.max(Runtime.getRuntime().availableProcessors(), 2));
         options.setInfoLogLevel(InfoLogLevel.WARN_LEVEL);
         columnFamilyOptions = new ColumnFamilyOptions();
+        columnFamilyOptions.setPeriodicCompactionSeconds(1L * 24L * 60L * 60L);
         writeOptions = new WriteOptions();
         readOptions = new ReadOptions();
         flushOptions = new FlushOptions();
