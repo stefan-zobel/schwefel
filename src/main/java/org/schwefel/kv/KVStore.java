@@ -626,6 +626,10 @@ public final class KVStore implements StoreOps, KindManagement {
         return stats;
     }
 
+    public synchronized RocksDB getRocksDB() {
+        return txnDb;
+    }
+
     private static void close(AutoCloseable ac) {
         if (ac != null) {
             try {
