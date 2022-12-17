@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.rocksdb.RocksDB;
 import org.schwefel.kv.KVStore;
 import org.schwefel.kv.Stats;
 import org.schwefel.kv.StoreOps;
@@ -67,5 +68,9 @@ public final class KueueManager implements AutoCloseable {
     public void close() {
         ops.close();
         kueues.clear();
+    }
+
+    public RocksDB getRocksDB() {
+        return ((KVStore) ops).getRocksDB();
     }
 }
