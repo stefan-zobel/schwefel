@@ -70,6 +70,10 @@ public final class KueueManager implements AutoCloseable {
         kueues.clear();
     }
 
+    public void compactAll() {
+        ((KVStore) ops).compactAll();
+    }
+
     public RocksDB getRocksDB() {
         return ((KVStore) ops).getRocksDB();
     }
