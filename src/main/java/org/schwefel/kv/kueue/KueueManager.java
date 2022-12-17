@@ -74,6 +74,10 @@ public final class KueueManager implements AutoCloseable {
         ((KVStore) ops).compactAll();
     }
 
+    public void syncWAL() {
+        ops.syncWAL();
+    }
+
     public RocksDB getRocksDB() {
         return ((KVStore) ops).getRocksDB();
     }
