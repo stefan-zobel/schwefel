@@ -82,7 +82,9 @@ public final class KVStore implements StoreOps, KindManagement {
         options.setCreateIfMissing(true);
         options.setErrorIfExists(false);
         options.setKeepLogFileNum(2);
-        options.setDeleteObsoleteFilesPeriodMicros(3600000000L);
+        options.setDeleteObsoleteFilesPeriodMicros(3_600_000_000L);
+        options.setWalTtlSeconds(4L * 3_600L);
+        options.setWalSizeLimitMB(64L);
         options.setRecycleLogFileNum(10L);
         options.setIncreaseParallelism(Math.max(Runtime.getRuntime().availableProcessors(), 2));
         options.setInfoLogLevel(InfoLogLevel.WARN_LEVEL);
