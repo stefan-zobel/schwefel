@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, 2022 Stefan Zobel
+ * Copyright 2020, 2023 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,7 +105,8 @@ public final class KVStore implements StoreOps, KindManagement {
     }
 
     private TransactionDB openDatabase() throws RocksDBException {
-        try (Options opts = new Options(options, columnFamilyOptions)) {
+        try (@SuppressWarnings("resource")
+        Options opts = new Options(options, columnFamilyOptions).optimizeLevelStyleCompaction()) {
             List<byte[]> families = RocksDB.listColumnFamilies(opts, path);
             ArrayList<ColumnFamilyDescriptor> cfDescs = new ArrayList<>();
             for (byte[] cfName : families) {
