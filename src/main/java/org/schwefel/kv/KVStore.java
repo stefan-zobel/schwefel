@@ -42,6 +42,7 @@ import org.rocksdb.Transaction;
 import org.rocksdb.TransactionDB;
 import org.rocksdb.TransactionDBOptions;
 import org.rocksdb.TransactionOptions;
+import org.rocksdb.TxnDBWritePolicy;
 import org.rocksdb.WriteBatch;
 import org.rocksdb.WriteOptions;
 
@@ -88,6 +89,7 @@ public final class KVStore implements StoreOps, KindManagement {
         options.setRecycleLogFileNum(10L);
         options.setIncreaseParallelism(Math.max(Runtime.getRuntime().availableProcessors(), 2));
         options.setInfoLogLevel(InfoLogLevel.WARN_LEVEL);
+        txnDbOptions.setWritePolicy(TxnDBWritePolicy.WRITE_COMMITTED);
         columnFamilyOptions = new ColumnFamilyOptions();
         columnFamilyOptions.setPeriodicCompactionSeconds(1L * 24L * 60L * 60L);
         columnFamilyOptions.optimizeLevelStyleCompaction();
