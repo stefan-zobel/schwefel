@@ -267,7 +267,7 @@ public final class KVStore implements StoreOps, KindManagement {
     }
 
     private void syncAndReset() {
-        syncWAL();
+        syncWALNoLock();
         lastSync = System.currentTimeMillis();
         totalSinceLastFsync = 0L;
     }
@@ -452,6 +452,10 @@ public final class KVStore implements StoreOps, KindManagement {
 
     @Override
     public synchronized void syncWAL() {
+        syncWALNoLock();
+    }
+
+    private void syncWALNoLock() {
         if (isOpen()) {
             long start = System.nanoTime();
             try {
