@@ -274,9 +274,8 @@ public final class KVStore implements StoreOps, KindManagement {
 
     private void occasionalWalSync() {
         ++totalSinceLastFsync;
-        if (System.currentTimeMillis() - lastSync >= FLUSH_TIME_WINDOW_MILLIS) {
-            syncAndReset();
-        } else if (totalSinceLastFsync % FLUSH_BATCH_SIZE == 0L) {
+        if ((System.currentTimeMillis() - lastSync >= FLUSH_TIME_WINDOW_MILLIS)
+                || (totalSinceLastFsync % FLUSH_BATCH_SIZE == 0L)) {
             syncAndReset();
         }
     }
