@@ -28,11 +28,11 @@ public class KueueThreadsTest {
 
             long end = System.currentTimeMillis();
 
-            System.out.println("put & del took: " + (end - start) + " ms");
-            System.out.println("average       : " + ((end - start) / (double) MSG_COUNT) + " ms / message");
-            System.out.println("total puts    : " + kueue.totalPuts());
-            System.out.println("total takes   : " + kueue.totalTakes());
-            System.out.println("queue size    : " + kueue.size());
+            System.out.println("put & del took : " + (end - start) + " ms");
+            System.out.println("average        : " + ((end - start) / (double) MSG_COUNT) + " ms / message");
+            System.out.println("total puts     : " + kueue.totalPuts());
+            System.out.println("total takes    : " + kueue.totalTakes());
+            System.out.println("queue size     : " + kueue.size());
             System.out.println("done");
             System.out.flush();
         }
@@ -119,7 +119,8 @@ public class KueueThreadsTest {
                     throw new RuntimeException(e);
                 }
             }
-            System.out.println("removed       : " + count + " messages");
+            System.out.println("RocksDD version: " + shared.getKueueManager().getRocksDBVersion());
+            System.out.println("removed        : " + count + " messages");
         }
     }
 

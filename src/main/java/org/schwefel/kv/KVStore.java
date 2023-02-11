@@ -36,6 +36,7 @@ import org.rocksdb.InfoLogLevel;
 import org.rocksdb.Options;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDB;
+import org.rocksdb.RocksDB.Version;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
 import org.rocksdb.Transaction;
@@ -89,7 +90,6 @@ public final class KVStore implements StoreOps, KindManagement {
         options.setRecycleLogFileNum(10L);
         options.setIncreaseParallelism(Math.max(Runtime.getRuntime().availableProcessors(), 2));
         options.setInfoLogLevel(InfoLogLevel.WARN_LEVEL);
-        txnDbOptions.setWritePolicy(TxnDBWritePolicy.WRITE_COMMITTED);
         columnFamilyOptions = new ColumnFamilyOptions();
         columnFamilyOptions.setPeriodicCompactionSeconds(1L * 24L * 60L * 60L);
         columnFamilyOptions.optimizeLevelStyleCompaction();
@@ -100,6 +100,7 @@ public final class KVStore implements StoreOps, KindManagement {
         flushOptionsNoWait = new FlushOptions();
         flushOptionsNoWait.setWaitForFlush(false);
         txnDbOptions = new TransactionDBOptions();
+        txnDbOptions.setWritePolicy(TxnDBWritePolicy.WRITE_COMMITTED);
         txnDb = (TransactionDB) wrapEx(() -> openDatabase());
         txnOpts = new TransactionOptions();
         open = true;
@@ -635,6 +636,12 @@ public final class KVStore implements StoreOps, KindManagement {
     @Override
     public synchronized Stats getStats() {
         return stats;
+    }
+
+    public String getRocksDBVersion() {
+        Version v = RocksDB.rocksdbVersion();
+        return new StringBuilder(6).append(v.getMajor()).append('.').append(v.getMinor()).append('.')
+                .append(v.getPatch()).toString();
     }
 
     public synchronized RocksDB getRocksDB() {

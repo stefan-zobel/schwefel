@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, 2022 Stefan Zobel
+ * Copyright 2021, 2023 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,6 +76,10 @@ public final class KueueManager implements AutoCloseable {
 
     public void syncWAL() {
         ops.syncWAL();
+    }
+
+    public String getRocksDBVersion() {
+        return ((KVStore) ops).getRocksDBVersion();
     }
 
     public RocksDB getRocksDB() {

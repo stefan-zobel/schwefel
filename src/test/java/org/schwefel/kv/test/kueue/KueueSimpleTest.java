@@ -25,7 +25,8 @@ public class KueueSimpleTest {
         try (KueueManager km = new KueueManager(Paths.get("D:/Temp/rocksdb_database"))) {
             Kueue queue = km.get(family);
 
-            System.out.println("queue size : " + queue.size());
+            System.out.println("RocksDD version: " + km.getRocksDBVersion());
+            System.out.println("queue size     : " + queue.size());
 
             long start = System.currentTimeMillis();
             for (int i = 1; i <= RUNS; ++i) {
@@ -33,17 +34,17 @@ public class KueueSimpleTest {
                 queue.put(value);
             }
             long end = System.currentTimeMillis();
-            System.out.println("put took   : " + ((end - start) / (double) queue.size()) + " ms / message");
+            System.out.println("put took       : " + ((end - start) / (double) queue.size()) + " ms / message");
 
-            System.out.println("queue size : " + queue.size());
+            System.out.println("queue size     : " + queue.size());
             long count = queue.size();
             start = System.currentTimeMillis();
             queue.clear();
             end = System.currentTimeMillis();
-            System.out.println("queue size : " + queue.size());
-            System.out.println("del took   : " + ((end - start) / (double) count) + " ms / message");
-            System.out.println("total puts : " + queue.totalPuts() + " , total takes: " + queue.totalTakes());
-            System.out.println("queue size : " + queue.size());
+            System.out.println("queue size     : " + queue.size());
+            System.out.println("del took       : " + ((end - start) / (double) count) + " ms / message");
+            System.out.println("total puts     : " + queue.totalPuts() + " , total takes: " + queue.totalTakes());
+            System.out.println("queue size     : " + queue.size());
 
             System.out.println("done");
         } catch (Throwable t) {
