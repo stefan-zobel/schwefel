@@ -295,6 +295,7 @@ import net.volcanite.util.Byte8Key;
         try {
             AtomicLong count = this.count;
             while (count.get() > 0L) {
+                // TODO: switch to singleDelete() ?
                 byte[] value = ops.singleDeleteIfPresent(id, minKey.current());
                 if (value != null) {
                     count.getAndDecrement();
