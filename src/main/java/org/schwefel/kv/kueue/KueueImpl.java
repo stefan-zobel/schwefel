@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, 2022 Stefan Zobel
+ * Copyright 2021, 2023 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -295,12 +295,9 @@ import net.volcanite.util.Byte8Key;
         try {
             AtomicLong count = this.count;
             while (count.get() > 0L) {
-                // TODO: switch to singleDelete() ?
-                byte[] value = ops.singleDeleteIfPresent(id, minKey.current());
-                if (value != null) {
-                    count.getAndDecrement();
-                    ++totalTakes;
-                }
+                ops.singleDelete(id, minKey.current());
+                count.getAndDecrement();
+                ++totalTakes;
                 minKey.increment();
             }
         } finally {
