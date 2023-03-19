@@ -103,6 +103,7 @@ public class SortedByteArrayMap implements SortedMap<byte[], byte[]> {
      */
     @Override
     public void putAll(Map<? extends byte[], ? extends byte[]> m) {
+        checkForNulls(m);
         map.putAll(m);
     }
 
@@ -243,5 +244,13 @@ public class SortedByteArrayMap implements SortedMap<byte[], byte[]> {
     @Override
     public String toString() {
         return map.toString();
+    }
+
+    private static void checkForNulls(Map<? extends byte[], ? extends byte[]> map) {
+        Objects.requireNonNull(map, "map cannot be null");
+        for (Map.Entry<? extends byte[], ? extends byte[]> e : map.entrySet()) {
+            Objects.requireNonNull(e.getKey(), "key cannot be null");
+            Objects.requireNonNull(e.getValue(), "value cannot be null");
+        }
     }
 }
