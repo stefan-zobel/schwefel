@@ -22,7 +22,6 @@ public interface StoreOps extends BasicOps, AutoCloseable {
     void putIfAbsent(Kind kind, byte[] key, byte[] value);
     byte[] get(Kind kind, byte[] key);
     void delete(Kind kind, byte[] key);
-    void deleteRange(Kind kind, byte[] beginKeyInclusive, byte[] endKeyExclusive);
     byte[] deleteIfPresent(Kind kind, byte[] key);
     byte[] updateIfPresent(Kind kind, byte[] key, byte[] value);
     void singleDelete(Kind kind, byte[] key);

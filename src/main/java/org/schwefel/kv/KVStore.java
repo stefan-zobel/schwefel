@@ -408,29 +408,6 @@ public final class KVStore implements StoreOps, KindManagement {
     }
 
     @Override
-    public synchronized void deleteRange(Kind kind, byte[] beginKeyInclusive, byte[] endKeyExclusive) {
-        long start = System.nanoTime();
-        Objects.requireNonNull(kind, "kind cannot be null");
-        Objects.requireNonNull(beginKeyInclusive, "beginKeyInclusive cannot be null");
-        Objects.requireNonNull(endKeyExclusive, "endKeyExclusive cannot be null");
-        if (lexicographicalCompare(beginKeyInclusive, endKeyExclusive) > 0) {
-            byte[] tmp = beginKeyInclusive;
-            beginKeyInclusive = endKeyExclusive;
-            endKeyExclusive = tmp;
-        }
-        validateOpen();
-        try {
-            txnDb.deleteRange(((KindImpl) kind).handle(), writeOptions, beginKeyInclusive, endKeyExclusive);
-        } catch (RocksDBException e) {
-            throw new StoreException(e);
-        } finally {
-            stats.deleteTimeNanos.accept(System.nanoTime() - start);
-            occasionalWalSync();
-            stats.allOpsTimeNanos.accept(System.nanoTime() - start);
-        }
-    }
-
-    @Override
     public synchronized void singleDelete(Kind kind, byte[] key) {
         long start = System.nanoTime();
         Objects.requireNonNull(kind, "kind cannot be null");
