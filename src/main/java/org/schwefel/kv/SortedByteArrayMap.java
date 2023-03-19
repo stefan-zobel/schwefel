@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Stefan Zobel
+ * Copyright 2020, 2023 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.schwefel.kv;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -84,6 +85,8 @@ public class SortedByteArrayMap implements SortedMap<byte[], byte[]> {
      */
     @Override
     public byte[] put(byte[] key, byte[] value) {
+        Objects.requireNonNull(key, "key cannot be null");
+        Objects.requireNonNull(value, "value cannot be null");
         return map.put(key, value);
     }
 
@@ -116,6 +119,8 @@ public class SortedByteArrayMap implements SortedMap<byte[], byte[]> {
      */
     @Override
     public byte[] putIfAbsent(byte[] key, byte[] value) {
+        Objects.requireNonNull(key, "key cannot be null");
+        Objects.requireNonNull(value, "value cannot be null");
         return map.putIfAbsent(key, value);
     }
 
@@ -124,6 +129,9 @@ public class SortedByteArrayMap implements SortedMap<byte[], byte[]> {
      */
     @Override
     public boolean replace(byte[] key, byte[] oldValue, byte[] newValue) {
+        Objects.requireNonNull(key, "key cannot be null");
+        Objects.requireNonNull(oldValue, "oldValue cannot be null");
+        Objects.requireNonNull(newValue, "newValue cannot be null");
         return map.replace(key, oldValue, newValue);
     }
 
@@ -132,6 +140,8 @@ public class SortedByteArrayMap implements SortedMap<byte[], byte[]> {
      */
     @Override
     public byte[] replace(byte[] key, byte[] value) {
+        Objects.requireNonNull(key, "key cannot be null");
+        Objects.requireNonNull(value, "value cannot be null");
         return map.replace(key, value);
     }
 
@@ -148,6 +158,8 @@ public class SortedByteArrayMap implements SortedMap<byte[], byte[]> {
      */
     @Override
     public SortedMap<byte[], byte[]> subMap(byte[] fromKey, byte[] toKey) {
+        Objects.requireNonNull(fromKey, "fromKey cannot be null");
+        Objects.requireNonNull(toKey, "toKey cannot be null");
         return map.subMap(fromKey, toKey);
     }
 
@@ -156,6 +168,7 @@ public class SortedByteArrayMap implements SortedMap<byte[], byte[]> {
      */
     @Override
     public SortedMap<byte[], byte[]> headMap(byte[] toKey) {
+        Objects.requireNonNull(toKey, "toKey cannot be null");
         return map.headMap(toKey);
     }
 
@@ -164,6 +177,7 @@ public class SortedByteArrayMap implements SortedMap<byte[], byte[]> {
      */
     @Override
     public SortedMap<byte[], byte[]> tailMap(byte[] fromKey) {
+        Objects.requireNonNull(fromKey, "fromKey cannot be null");
         return map.tailMap(fromKey);
     }
 

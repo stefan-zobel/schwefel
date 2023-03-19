@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, 2022 Stefan Zobel
+ * Copyright 2020, 2023 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,6 +103,7 @@ class Transactional implements Tx {
     public synchronized void put(Kind kind, byte[] key, byte[] value) {
         Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
+        Objects.requireNonNull(value, "value cannot be null");
         validateOwned();
         try {
             txn.put(((KindImpl) kind).handle(), key, value);
@@ -115,6 +116,7 @@ class Transactional implements Tx {
     public synchronized void putIfAbsent(Kind kind, byte[] key, byte[] value) {
         Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
+        Objects.requireNonNull(value, "value cannot be null");
         validateOwned();
         try {
             if (get(kind, key) == null) {
@@ -388,6 +390,7 @@ class Transactional implements Tx {
     public synchronized byte[] updateIfPresent(Kind kind, byte[] key, byte[] value) {
         Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
+        Objects.requireNonNull(value, "value cannot be null");
         validateOwned();
         byte[] oldVal = null;
         try {

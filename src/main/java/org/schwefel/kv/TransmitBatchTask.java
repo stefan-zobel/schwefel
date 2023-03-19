@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Stefan Zobel
+ * Copyright 2020, 2023 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ public final class TransmitBatchTask implements AsyncTask {
 
         @Override
         public void accept(byte[] key, byte[] value) {
-            if (key != null && key.length > 0) {
+            if (key != null && key.length > 0 && value != null) {
                 try {
                     batch.put(kind, key, value);
                 } catch (Throwable t) {

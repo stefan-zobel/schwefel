@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, 2021 Stefan Zobel
+ * Copyright 2020, 2023 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ class BatchImpl implements Batch, AutoCloseable {
     public synchronized void put(Kind kind, byte[] key, byte[] value) {
         Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
+        Objects.requireNonNull(value, "value cannot be null");
         validateOwned();
         try {
             batch.put(((KindImpl) kind).handle(), key, value);
