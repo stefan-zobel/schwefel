@@ -287,6 +287,7 @@ public final class KVStore implements StoreOps, KindManagement {
         long start = System.nanoTime();
         Objects.requireNonNull(kind, "kind cannot be null");
         Objects.requireNonNull(key, "key cannot be null");
+        Objects.requireNonNull(value, "value cannot be null");
         validateOpen();
         try {
             if (get_(kind, key) == null) {
