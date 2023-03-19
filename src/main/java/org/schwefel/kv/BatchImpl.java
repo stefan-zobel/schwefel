@@ -19,6 +19,7 @@ import java.util.Objects;
 
 import org.rocksdb.RocksDBException;
 import org.rocksdb.WriteBatch;
+import static org.schwefel.kv.LexicographicByteArrayComparator.lexicographicalCompare;
 
 class BatchImpl implements Batch, AutoCloseable {
 
@@ -60,6 +61,24 @@ class BatchImpl implements Batch, AutoCloseable {
         validateOwned();
         try {
             batch.singleDelete(((KindImpl) kind).handle(), key);
+        } catch (RocksDBException e) {
+            throw new StoreException(e);
+        }
+    }
+
+    @Override
+    public synchronized void deleteRange(Kind kind, byte[] beginKeyInclusive, byte[] endKeyExclusive) {
+        Objects.requireNonNull(kind, "kind cannot be null");
+        Objects.requireNonNull(beginKeyInclusive, "beginKeyInclusive cannot be null");
+        Objects.requireNonNull(endKeyExclusive, "endKeyExclusive cannot be null");
+        if (lexicographicalCompare(beginKeyInclusive, endKeyExclusive) > 0) {
+            byte[] tmp = beginKeyInclusive;
+            beginKeyInclusive = endKeyExclusive;
+            endKeyExclusive = tmp;
+        }
+        validateOwned();
+        try {
+            batch.deleteRange(((KindImpl) kind).handle(), beginKeyInclusive, endKeyExclusive);
         } catch (RocksDBException e) {
             throw new StoreException(e);
         }
