@@ -10,6 +10,7 @@ A dead simple [RocksDB](https://github.com/facebook/rocksdb) Java wrapper
 
 Status:
 
+* In contrast to RocksDB null values are not allowed
 * Mostly undocumented; not thoroughly tested
 * Only suited for adventurous developers
 
@@ -20,6 +21,6 @@ Status:
 <dependency>
     <groupId>net.sourceforge.streamsupport</groupId>
     <artifactId>schwefel</artifactId>
-    <version>7.10.2.1</version>
+    <version>8.0.0.1</version>
 </dependency>
 ```
