@@ -119,7 +119,7 @@ public class KueueThreadsTest {
                     throw new RuntimeException(e);
                 }
             }
-            System.out.println("RocksDD version: " + shared.getKueueManager().getRocksDBVersion());
+            System.out.println("RocksDB version: " + shared.getKueueManager().getRocksDBVersion());
             System.out.println("removed        : " + count + " messages");
         }
     }

@@ -39,7 +39,7 @@ public class PutGetDeletePerfTest {
                 }
             }
 
-            System.out.println("RocksDD version: " + ((KVStore) store).getRocksDBVersion());
+            System.out.println("RocksDB version: " + ((KVStore) store).getRocksDBVersion());
             System.out.println("runti>  avg: " + (runtime / (double) RUNS) + " ms");
             printPutStatistics(store.getStats());
             printGetStatistics(store.getStats());

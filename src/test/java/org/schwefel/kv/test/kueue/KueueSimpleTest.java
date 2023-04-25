@@ -25,7 +25,7 @@ public class KueueSimpleTest {
         try (KueueManager km = new KueueManager(Paths.get("D:/Temp/rocksdb_database"))) {
             Kueue queue = km.get(family);
 
-            System.out.println("RocksDD version: " + km.getRocksDBVersion());
+            System.out.println("RocksDB version: " + km.getRocksDBVersion());
             System.out.println("queue size     : " + queue.size());
 
             long start = System.currentTimeMillis();
