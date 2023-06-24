@@ -297,7 +297,7 @@ public abstract class AbstractMutableOptions {
         unknown.add(option);
         return self();
       } else if (key == null) {
-        throw new IllegalArgumentException("Key: " + null + " is not a known option key");
+        throw new IllegalArgumentException("Key: null is not a known option key");
       }
 
       if (!option.value.isList()) {
