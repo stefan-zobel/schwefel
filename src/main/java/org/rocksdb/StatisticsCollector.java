@@ -20,10 +20,10 @@ import java.util.concurrent.TimeUnit;
  * provided in constructor) reference has been disposed.</p>
  */
 public class StatisticsCollector {
-  /*package*/ final List<StatsCollectorInput> _statsCollectorInputList;
+  private final List<StatsCollectorInput> _statsCollectorInputList;
   private final ExecutorService _executorService;
-  /*package*/ final int _statsCollectionInterval;
-  /*package*/ volatile boolean _isRunning = true;
+  private final int _statsCollectionInterval;
+  private volatile boolean _isRunning = true;
 
   /**
    * Constructor for statistics collector.
@@ -62,48 +62,39 @@ public class StatisticsCollector {
   }
 
   private Runnable collectStatistics() {
-    return new Runnable() {
-
-      @Override
-      public void run() {
-        while (_isRunning) {
-          try {
-            if(Thread.currentThread().isInterrupted()) {
-              break;
-            }
-            for(final StatsCollectorInput statsCollectorInput :
-                _statsCollectorInputList) {
-              Statistics statistics = statsCollectorInput.getStatistics();
-              StatisticsCollectorCallback statsCallback =
-                  statsCollectorInput.getCallback();
-
-              // Collect ticker data
-              for(final TickerType ticker : TickerType.values()) {
-                if(ticker != TickerType.TICKER_ENUM_MAX) {
-                  final long tickerValue = statistics.getTickerCount(ticker);
-                  statsCallback.tickerCallback(ticker, tickerValue);
-                }
-              }
-
-              // Collect histogram data
-              for(final HistogramType histogramType : HistogramType.values()) {
-                if(histogramType != HistogramType.HISTOGRAM_ENUM_MAX) {
-                  final HistogramData histogramData =
-                          statistics.getHistogramData(histogramType);
-                  statsCallback.histogramCallback(histogramType, histogramData);
-                }
-              }
-            }
-
-            Thread.sleep(_statsCollectionInterval);
-          }
-          catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
+    return () -> {
+      while (_isRunning) {
+        try {
+          if (Thread.currentThread().isInterrupted()) {
             break;
           }
-          catch (final Exception e) {
-            throw new RuntimeException("Error while calculating statistics", e);
+          for (final StatsCollectorInput statsCollectorInput : _statsCollectorInputList) {
+            final Statistics statistics = statsCollectorInput.getStatistics();
+            final StatisticsCollectorCallback statsCallback = statsCollectorInput.getCallback();
+
+            // Collect ticker data
+            for (final TickerType ticker : TickerType.values()) {
+              if (ticker != TickerType.TICKER_ENUM_MAX) {
+                final long tickerValue = statistics.getTickerCount(ticker);
+                statsCallback.tickerCallback(ticker, tickerValue);
+              }
+            }
+
+            // Collect histogram data
+            for (final HistogramType histogramType : HistogramType.values()) {
+              if (histogramType != HistogramType.HISTOGRAM_ENUM_MAX) {
+                final HistogramData histogramData = statistics.getHistogramData(histogramType);
+                statsCallback.histogramCallback(histogramType, histogramData);
+              }
+            }
           }
+
+          Thread.sleep(_statsCollectionInterval);
+        } catch (final InterruptedException e) {
+          Thread.currentThread().interrupt();
+          break;
+        } catch (final Exception e) {
+          throw new RuntimeException("Error while calculating statistics", e);
         }
       }
     };
