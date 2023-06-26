@@ -103,6 +103,7 @@ public final class KVStore implements StoreOps, KindManagement {
         txnDbOptions.setWritePolicy(TxnDBWritePolicy.WRITE_COMMITTED);
         txnDb = (TransactionDB) wrapEx(() -> openDatabase());
         txnOpts = new TransactionOptions();
+        enableObsoleteFilesDeletion();
         open = true;
         lastSync = System.currentTimeMillis();
     }
@@ -649,6 +650,15 @@ public final class KVStore implements StoreOps, KindManagement {
 
     public synchronized RocksDB getRocksDB() {
         return txnDb;
+    }
+
+    private void enableObsoleteFilesDeletion() {
+        try {
+            txnDb.enableFileDeletions(true);
+        } catch (RocksDBException e) {
+            logger.log(Level.WARNING, "", e);
+            throw new StoreException(e);
+        }
     }
 
     private static void close(AutoCloseable ac) {
