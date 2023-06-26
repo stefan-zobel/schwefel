@@ -85,4 +85,8 @@ public final class KueueManager implements AutoCloseable {
     public RocksDB getRocksDB() {
         return ((KVStore) ops).getRocksDB();
     }
+
+    public StoreOps getStore() {
+        return ops;
+    }
 }
