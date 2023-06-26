@@ -233,6 +233,21 @@ public final class KVStore implements StoreOps, KindManagement {
         }
     }
 
+    @Override
+    public void deleteKind(Kind kind) {
+        Objects.requireNonNull(kind, "kind cannot be null");
+        validateOpen();
+        if (!"default".equals(kind.name())) {
+            try {
+                txnDb.dropColumnFamily(((KindImpl) kind).handle());
+                kinds.remove(kind.name());
+            } catch (RocksDBException e) {
+                logger.log(Level.WARNING, "", e);
+                throw new StoreException(e);
+            }
+        }
+    }
+
     private void compact_(KindImpl kind) {
         try {
             txnDb.compactRange(kind.handle());

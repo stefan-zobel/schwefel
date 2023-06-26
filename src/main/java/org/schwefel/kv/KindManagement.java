@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Stefan Zobel
+ * Copyright 2021, 2023 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,4 +25,5 @@ public interface KindManagement {
     Kind getDefaultKind();
     void compact(String kindName);
     void compactAll();
+    void deleteKind(Kind kind);
 }
