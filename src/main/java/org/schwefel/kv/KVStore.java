@@ -27,6 +27,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.rocksdb.BlockBasedTableConfig;
 import org.rocksdb.ColumnFamilyDescriptor;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.ColumnFamilyOptions;
@@ -80,7 +81,11 @@ public final class KVStore implements StoreOps, KindManagement {
     }
 
     private void open() {
+        BlockBasedTableConfig sstFileFormat = new BlockBasedTableConfig();
+        sstFileFormat.setBlockSize(4 * sstFileFormat.blockSize());
+//      sstFileFormat.setCacheIndexAndFilterBlocks(true);
         options = new DBOptions();
+        options.optimizeForSmallDb();
         options.setCreateIfMissing(true);
         options.setErrorIfExists(false);
         options.setKeepLogFileNum(2);
@@ -91,8 +96,10 @@ public final class KVStore implements StoreOps, KindManagement {
         options.setIncreaseParallelism(Math.max(Runtime.getRuntime().availableProcessors(), 2));
         options.setInfoLogLevel(InfoLogLevel.WARN_LEVEL);
         columnFamilyOptions = new ColumnFamilyOptions();
+        columnFamilyOptions.optimizeForSmallDb();
         columnFamilyOptions.setPeriodicCompactionSeconds(1L * 24L * 60L * 60L);
-        columnFamilyOptions.optimizeLevelStyleCompaction();
+        columnFamilyOptions.setOptimizeFiltersForHits(true);
+        columnFamilyOptions.setTableFormatConfig(sstFileFormat);
         writeOptions = new WriteOptions();
         readOptions = new ReadOptions();
         flushOptions = new FlushOptions();
@@ -109,8 +116,7 @@ public final class KVStore implements StoreOps, KindManagement {
     }
 
     private TransactionDB openDatabase() throws RocksDBException {
-        try (@SuppressWarnings("resource")
-        Options opts = new Options(options, columnFamilyOptions).optimizeLevelStyleCompaction()) {
+        try (Options opts = new Options(options, columnFamilyOptions)) {
             List<byte[]> families = RocksDB.listColumnFamilies(opts, path);
             ArrayList<ColumnFamilyDescriptor> cfDescs = new ArrayList<>();
             for (byte[] cfName : families) {
