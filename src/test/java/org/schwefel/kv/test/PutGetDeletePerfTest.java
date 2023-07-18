@@ -2,6 +2,7 @@ package org.schwefel.kv.test;
 
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Map;
 
 import org.schwefel.kv.KVStore;
 import org.schwefel.kv.Kind;
@@ -19,8 +20,10 @@ public class PutGetDeletePerfTest {
         int RUNS = 750_000;
         long runtime = 0L;
 
-        try (StoreOps store = new KVStore(Paths.get("D:/Temp/rocksdb_database"))) {
+        try (StoreOps store = new KVStore(Paths.get("C:/Temp/rocksdb_database"))) {
             Kind defaultKind = store.getKindManagement().getDefaultKind();
+            printSstFiles(store);
+
             for (int i = 0; i < RUNS; ++i) {
                 long start = System.currentTimeMillis();
                 byte[] key = randomBytes();
@@ -43,6 +46,7 @@ public class PutGetDeletePerfTest {
             System.out.println("runti>  avg: " + (runtime / (double) RUNS) + " ms");
             printPutStatistics(store.getStats());
             printGetStatistics(store.getStats());
+            printSstFiles(store);
         }
     }
 
@@ -78,5 +82,12 @@ public class PutGetDeletePerfTest {
         System.out.println("get  >  avg: " + round(readTimeNanos.getAverage() / 1_000_000.0) + ", n: "
                 + readTimeNanos.getCount() + ", std: " + round(readTimeNanos.getStandardDeviation() / 1_000_000.0)
                 + ", min: " + readTimeNanos.getMin() / 1_000_000.0 + ", max: " + readTimeNanos.getMax() / 1_000_000.0);
+    }
+
+    private static void printSstFiles(StoreOps store) {
+        Map<String, Long> trackedSstFiles = store.getTrackedSstFiles();
+        if (!trackedSstFiles.isEmpty()) {
+            System.out.println("SST : " + trackedSstFiles);
+        }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, 2021 Stefan Zobel
+ * Copyright 2020, 2023 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package org.schwefel.kv;
+
+import java.util.Map;
 
 public interface StoreOps extends BasicOps, AutoCloseable {
 
@@ -46,4 +48,6 @@ public interface StoreOps extends BasicOps, AutoCloseable {
     void flushNoWait();
     KindManagement getKindManagement();
     Stats getStats();
+    Map<String, Map<String, String>> getRocksDBStats();
+    Map<String, Long> getTrackedSstFiles();
 }

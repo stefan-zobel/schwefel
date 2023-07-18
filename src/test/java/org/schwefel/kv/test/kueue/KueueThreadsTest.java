@@ -2,6 +2,7 @@ package org.schwefel.kv.test.kueue;
 
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Random;
 
 import org.schwefel.kv.kueue.Kueue;
@@ -13,7 +14,7 @@ public class KueueThreadsTest {
         final int MSG_COUNT = 500_000;
         final String family = "Test-DB";
 
-        try (KueueManager km = new KueueManager(Paths.get("D:/Temp/rocksdb_database"))) {
+        try (KueueManager km = new KueueManager(Paths.get("C:/Temp/rocksdb_database"))) {
             Kueue kueue = km.get(family);
             Producer p = new Producer(kueue, MSG_COUNT);
             Consumer c = new Consumer(kueue, MSG_COUNT);
@@ -35,6 +36,8 @@ public class KueueThreadsTest {
             System.out.println("queue size     : " + kueue.size());
             System.out.println("done");
             System.out.flush();
+            showMemoryProperties(km);
+            km.compactAll();
         }
     }
 
@@ -138,5 +141,11 @@ public class KueueThreadsTest {
     static int readInt(byte[] buffer, int offset) {
         return ((buffer[offset] & 0xff) << 24) + ((buffer[offset + 1] & 0xff) << 16)
                 + ((buffer[offset + 2] & 0xff) << 8) + (buffer[offset + 3] & 0xff);
+    }
+
+    static void showMemoryProperties(KueueManager km) {
+        Map<String, Map<String, String>> statistics = km.getRocksDBStats();
+        System.out.println(System.lineSeparator() + statistics);
+        System.out.flush();
     }
 }
