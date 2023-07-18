@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +35,7 @@ import org.rocksdb.ColumnFamilyDescriptor;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.ColumnFamilyOptions;
 import org.rocksdb.DBOptions;
+import org.rocksdb.Env;
 import org.rocksdb.FlushOptions;
 import org.rocksdb.InfoLogLevel;
 import org.rocksdb.Options;
@@ -42,6 +44,7 @@ import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDB.Version;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
+import org.rocksdb.SstFileManager;
 import org.rocksdb.Transaction;
 import org.rocksdb.TransactionDB;
 import org.rocksdb.TransactionDBOptions;
@@ -72,6 +75,7 @@ public final class KVStore implements StoreOps, KindManagement {
     private ReadOptions readOptions;
     private FlushOptions flushOptions;
     private FlushOptions flushOptionsNoWait;
+    private SstFileManager sstFileManager;
     private final HashMap<String, KindImpl> kinds = new HashMap<>(); 
     private final String path;
     private final Stats stats = new Stats();
@@ -86,6 +90,7 @@ public final class KVStore implements StoreOps, KindManagement {
         BlockBasedTableConfig sstFileFormat = new BlockBasedTableConfig();
         sstFileFormat.setBlockSize(4 * sstFileFormat.blockSize());
 //      sstFileFormat.setCacheIndexAndFilterBlocks(true);
+        sstFileManager = createSstFileManager();
         options = new DBOptions();
         options.optimizeForSmallDb();
         options.setCreateIfMissing(true);
@@ -97,6 +102,9 @@ public final class KVStore implements StoreOps, KindManagement {
         options.setRecycleLogFileNum(10L);
         options.setIncreaseParallelism(Math.max(Runtime.getRuntime().availableProcessors(), 2));
         options.setInfoLogLevel(InfoLogLevel.WARN_LEVEL);
+        if (sstFileManager != null) {
+            options.setSstFileManager(sstFileManager);
+        }
         columnFamilyOptions = new ColumnFamilyOptions();
         columnFamilyOptions.optimizeForSmallDb();
         columnFamilyOptions.setPeriodicCompactionSeconds(1L * 24L * 60L * 60L);
@@ -157,6 +165,7 @@ public final class KVStore implements StoreOps, KindManagement {
         close(flushOptions);
         close(flushOptionsNoWait);
         close(options);
+        close(sstFileManager);
         txnDb = null;
         txnDbOptions = null;
         txnOpts = null;
@@ -166,6 +175,7 @@ public final class KVStore implements StoreOps, KindManagement {
         flushOptions = null;
         flushOptionsNoWait = null;
         options = null;
+        sstFileManager = null;
     }
 
     private void closeCfHandles() {
@@ -678,6 +688,15 @@ public final class KVStore implements StoreOps, KindManagement {
         return family2Statistics;
     }
 
+    @Override
+    public /* synchronized */ Map<String, Long> getTrackedSstFiles() {
+        validateOpen();
+        if (sstFileManager != null) {
+            return sstFileManager.getTrackedFiles();
+        }
+        return Collections.emptyMap();
+    }
+
     public String getRocksDBVersion() {
         Version v = RocksDB.rocksdbVersion();
         return new StringBuilder(6).append(v.getMajor()).append('.').append(v.getMinor()).append('.')
@@ -695,6 +714,15 @@ public final class KVStore implements StoreOps, KindManagement {
             logger.log(Level.WARNING, "", e);
             throw new StoreException(e);
         }
+    }
+
+    private SstFileManager createSstFileManager() {
+        try {
+            return new SstFileManager(Env.getDefault());
+        } catch (RocksDBException ignore) {
+            logger.log(Level.INFO, "", ignore);
+        }
+        return null;
     }
 
     private static void close(AutoCloseable ac) {

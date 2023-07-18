@@ -49,4 +49,5 @@ public interface StoreOps extends BasicOps, AutoCloseable {
     KindManagement getKindManagement();
     Stats getStats();
     Map<String, Map<String, String>> getRocksDBStats();
+    Map<String, Long> getTrackedSstFiles();
 }

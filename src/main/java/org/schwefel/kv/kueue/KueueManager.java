@@ -87,6 +87,10 @@ public final class KueueManager implements AutoCloseable {
         return ops.getRocksDBStats();
     }
 
+    public Map<String, Long> getTrackedSstFiles() {
+        return ops.getTrackedSstFiles();
+    }
+
     public RocksDB getRocksDB() {
         return ((KVStore) ops).getRocksDB();
     }
