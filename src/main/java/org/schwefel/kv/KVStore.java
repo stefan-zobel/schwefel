@@ -20,7 +20,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -661,6 +663,19 @@ public final class KVStore implements StoreOps, KindManagement {
     @Override
     public synchronized Stats getStats() {
         return stats;
+    }
+
+    @Override
+    public /* synchronized */ Map<String, Map<String, String>> getRocksDBStats() {
+        validateOpen();
+        HashMap<String, Map<String, String>> family2Statistics = new HashMap<>();
+        Iterator<Map.Entry<String, KindImpl>> it = kinds.entrySet().iterator();
+        while (isOpen() && it.hasNext()) {
+            Map.Entry<String, KindImpl> entry = it.next();
+            Map<String, String> stats = MemStats.getStats(txnDb, entry.getValue());
+            family2Statistics.put(entry.getKey(), stats);
+        }
+        return family2Statistics;
     }
 
     public String getRocksDBVersion() {

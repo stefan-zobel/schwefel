@@ -17,6 +17,7 @@ package org.schwefel.kv.kueue;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -80,6 +81,10 @@ public final class KueueManager implements AutoCloseable {
 
     public String getRocksDBVersion() {
         return ((KVStore) ops).getRocksDBVersion();
+    }
+
+    public Map<String, Map<String, String>> getRocksDBStats() {
+        return ops.getRocksDBStats();
     }
 
     public RocksDB getRocksDB() {
