@@ -58,7 +58,7 @@ import static org.schwefel.kv.LexicographicByteArrayComparator.lexicographicalCo
 public final class KVStore implements StoreOps, KindManagement {
 
     private static final long FLUSH_TIME_WINDOW_MILLIS = 985L;
-    private static final long FLUSH_BATCH_SIZE = 20_000L;
+    private static final long FLUSH_BATCH_SIZE = 16_384L - 1L;
 
     private static final Logger logger = Logger.getLogger(KVStore.class.getName());
 
@@ -311,7 +311,7 @@ public final class KVStore implements StoreOps, KindManagement {
     private void occasionalWalSync() {
         ++totalSinceLastFsync;
         if ((System.currentTimeMillis() - lastSync >= FLUSH_TIME_WINDOW_MILLIS)
-                || (totalSinceLastFsync % FLUSH_BATCH_SIZE == 0L)) {
+                || ((totalSinceLastFsync & FLUSH_BATCH_SIZE) == 0L)) {
             syncAndReset();
         }
     }
