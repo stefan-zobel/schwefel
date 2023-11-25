@@ -3707,7 +3707,7 @@ public class RocksDB extends RocksObject {
 
   /**
    * Set performance level for rocksdb performance measurement.
-   * @param level
+   * @param level the performance level
    * @throws IllegalArgumentException for UNINITIALIZED and OUT_OF_BOUNDS values
    *    as they can't be used for settings.
    */
@@ -3724,7 +3724,7 @@ public class RocksDB extends RocksObject {
 
   /**
    * Return current performance level measurement settings.
-   * @return
+   * @return the performance level
    */
   public PerfLevel getPerfLevel() {
     byte level = getPerfLevelNative();
@@ -3733,7 +3733,7 @@ public class RocksDB extends RocksObject {
 
   /**
    * Return perf context bound to this thread.
-   * @return
+   * @return the performance context
    */
   public PerfContext getPerfContext() {
     long native_handle = getPerfContextNative();
