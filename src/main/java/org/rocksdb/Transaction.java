@@ -5,6 +5,8 @@
 
 package org.rocksdb;
 
+import static org.rocksdb.RocksDB.PERFORMANCE_OPTIMIZATION_FOR_A_VERY_SPECIFIC_WORKLOAD;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +28,8 @@ import java.util.List;
  * examples.
  */
 public class Transaction extends RocksObject {
+  private static final String FOR_EACH_KEY_THERE_MUST_BE_A_COLUMNFAMILYHANDLE =
+      "For each key there must be a ColumnFamilyHandle.";
 
   private final RocksDB parent;
 
@@ -346,8 +350,7 @@ public class Transaction extends RocksObject {
     // Check if key size equals cfList size. If not a exception must be
     // thrown. If not a Segmentation fault happens.
     if (keys.length != columnFamilyHandles.size()) {
-      throw new IllegalArgumentException(
-          "For each key there must be a ColumnFamilyHandle.");
+      throw new IllegalArgumentException(FOR_EACH_KEY_THERE_MUST_BE_A_COLUMNFAMILYHANDLE);
     }
     if(keys.length == 0) {
       return new byte[0][0];
@@ -397,9 +400,9 @@ public class Transaction extends RocksObject {
     // Check if key size equals cfList size. If not a exception must be
     // thrown. If not a Segmentation fault happens.
     if (keys.size() != columnFamilyHandles.size()) {
-      throw new IllegalArgumentException("For each key there must be a ColumnFamilyHandle.");
+      throw new IllegalArgumentException(FOR_EACH_KEY_THERE_MUST_BE_A_COLUMNFAMILYHANDLE);
     }
-    if (keys.size() == 0) {
+    if (keys.isEmpty()) {
       return new ArrayList<>(0);
     }
     final byte[][] keysArray = keys.toArray(new byte[keys.size()][]);
@@ -475,7 +478,7 @@ public class Transaction extends RocksObject {
    */
   public List<byte[]> multiGetAsList(final ReadOptions readOptions, final List<byte[]> keys)
       throws RocksDBException {
-    if (keys.size() == 0) {
+    if (keys.isEmpty()) {
       return new ArrayList<>(0);
     }
     final byte[][] keysArray = keys.toArray(new byte[keys.size()][]);
@@ -638,8 +641,7 @@ public class Transaction extends RocksObject {
     // Check if key size equals cfList size. If not a exception must be
     // thrown. If not a Segmentation fault happens.
     if (keys.length != columnFamilyHandles.size()){
-      throw new IllegalArgumentException(
-          "For each key there must be a ColumnFamilyHandle.");
+      throw new IllegalArgumentException(FOR_EACH_KEY_THERE_MUST_BE_A_COLUMNFAMILYHANDLE);
     }
     if(keys.length == 0) {
       return new byte[0][0];
@@ -674,9 +676,9 @@ public class Transaction extends RocksObject {
     // Check if key size equals cfList size. If not a exception must be
     // thrown. If not a Segmentation fault happens.
     if (keys.size() != columnFamilyHandles.size()) {
-      throw new IllegalArgumentException("For each key there must be a ColumnFamilyHandle.");
+      throw new IllegalArgumentException(FOR_EACH_KEY_THERE_MUST_BE_A_COLUMNFAMILYHANDLE);
     }
-    if (keys.size() == 0) {
+    if (keys.isEmpty()) {
       return new ArrayList<>();
     }
     final byte[][] keysArray = keys.toArray(new byte[keys.size()][]);
@@ -728,7 +730,7 @@ public class Transaction extends RocksObject {
   public List<byte[]> multiGetForUpdateAsList(
       final ReadOptions readOptions, final List<byte[]> keys) throws RocksDBException {
     assert (isOwningHandle());
-    if (keys.size() == 0) {
+    if (keys.isEmpty()) {
       return new ArrayList<>(0);
     }
 
@@ -1228,9 +1230,9 @@ public class Transaction extends RocksObject {
    * @throws RocksDBException when one of the TransactionalDB conditions
    *     described above occurs, or in the case of an unexpected error
    */
-  @Experimental("Performance optimization for a very specific workload")
-  public void singleDelete(final ColumnFamilyHandle columnFamilyHandle,
-      final byte[] key, final boolean assumeTracked) throws RocksDBException {
+  @Experimental(PERFORMANCE_OPTIMIZATION_FOR_A_VERY_SPECIFIC_WORKLOAD)
+  public void singleDelete(final ColumnFamilyHandle columnFamilyHandle, final byte[] key,
+      final boolean assumeTracked) throws RocksDBException {
     assert (isOwningHandle());
     singleDelete(nativeHandle_, key, key.length,
         columnFamilyHandle.nativeHandle_, assumeTracked);
@@ -1260,9 +1262,9 @@ public class Transaction extends RocksObject {
    * @throws RocksDBException when one of the TransactionalDB conditions
    *     described above occurs, or in the case of an unexpected error
    */
-  @Experimental("Performance optimization for a very specific workload")
-  public void singleDelete(final ColumnFamilyHandle columnFamilyHandle,
-      final byte[] key) throws RocksDBException {
+  @Experimental(PERFORMANCE_OPTIMIZATION_FOR_A_VERY_SPECIFIC_WORKLOAD)
+  public void singleDelete(final ColumnFamilyHandle columnFamilyHandle, final byte[] key)
+      throws RocksDBException {
     assert(isOwningHandle());
     singleDelete(nativeHandle_, key, key.length,
         columnFamilyHandle.nativeHandle_, false);
@@ -1289,7 +1291,7 @@ public class Transaction extends RocksObject {
    * @throws RocksDBException when one of the TransactionalDB conditions
    *     described above occurs, or in the case of an unexpected error
    */
-  @Experimental("Performance optimization for a very specific workload")
+  @Experimental(PERFORMANCE_OPTIMIZATION_FOR_A_VERY_SPECIFIC_WORKLOAD)
   public void singleDelete(final byte[] key) throws RocksDBException {
     assert(isOwningHandle());
     singleDelete(nativeHandle_, key, key.length);
@@ -1312,10 +1314,9 @@ public class Transaction extends RocksObject {
    * @throws RocksDBException when one of the TransactionalDB conditions
    *     described above occurs, or in the case of an unexpected error
    */
-  @Experimental("Performance optimization for a very specific workload")
-  public void singleDelete(final ColumnFamilyHandle columnFamilyHandle,
-      final byte[][] keyParts, final boolean assumeTracked)
-      throws RocksDBException {
+  @Experimental(PERFORMANCE_OPTIMIZATION_FOR_A_VERY_SPECIFIC_WORKLOAD)
+  public void singleDelete(final ColumnFamilyHandle columnFamilyHandle, final byte[][] keyParts,
+      final boolean assumeTracked) throws RocksDBException {
     assert (isOwningHandle());
     singleDelete(nativeHandle_, keyParts, keyParts.length,
         columnFamilyHandle.nativeHandle_, assumeTracked);
@@ -1334,9 +1335,9 @@ public class Transaction extends RocksObject {
    * @throws RocksDBException when one of the TransactionalDB conditions
    *     described above occurs, or in the case of an unexpected error
    */
-  @Experimental("Performance optimization for a very specific workload")
-  public void singleDelete(final ColumnFamilyHandle columnFamilyHandle,
-      final byte[][] keyParts) throws RocksDBException {
+  @Experimental(PERFORMANCE_OPTIMIZATION_FOR_A_VERY_SPECIFIC_WORKLOAD)
+  public void singleDelete(final ColumnFamilyHandle columnFamilyHandle, final byte[][] keyParts)
+      throws RocksDBException {
     assert(isOwningHandle());
     singleDelete(nativeHandle_, keyParts, keyParts.length,
         columnFamilyHandle.nativeHandle_, false);
@@ -1353,7 +1354,7 @@ public class Transaction extends RocksObject {
    * @throws RocksDBException when one of the TransactionalDB conditions
    *     described above occurs, or in the case of an unexpected error
    */
-  @Experimental("Performance optimization for a very specific workload")
+  @Experimental(PERFORMANCE_OPTIMIZATION_FOR_A_VERY_SPECIFIC_WORKLOAD)
   public void singleDelete(final byte[][] keyParts) throws RocksDBException {
     assert(isOwningHandle());
     singleDelete(nativeHandle_, keyParts, keyParts.length);
@@ -1982,8 +1983,7 @@ public class Transaction extends RocksObject {
    * @return The waiting transactions
    */
   private static WaitingTransactions newWaitingTransactions(
-      final long columnFamilyId, final String key,
-      final long[] transactionIds) {
+      final long columnFamilyId, final String key, final long[] transactionIds) {
     return new WaitingTransactions(columnFamilyId, key, transactionIds);
   }
 

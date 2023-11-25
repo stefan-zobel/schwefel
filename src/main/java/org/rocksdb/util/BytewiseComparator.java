@@ -39,7 +39,8 @@ public final class BytewiseComparator extends AbstractComparator {
 
   static int _compare(final ByteBuffer a, final ByteBuffer b) {
     assert(a != null && b != null);
-    final int minLen = Math.min(a.remaining(), b.remaining());
+    final int minLen = a.remaining() < b.remaining() ?
+        a.remaining() : b.remaining();
     int r = memcmp(a, b, minLen);
     if (r == 0) {
       if (a.remaining() < b.remaining()) {
@@ -52,8 +53,7 @@ public final class BytewiseComparator extends AbstractComparator {
   }
 
   @Override
-  public void findShortestSeparator(final ByteBuffer start,
-      final ByteBuffer limit) {
+  public void findShortestSeparator(final ByteBuffer start, final ByteBuffer limit) {
     // Find length of common prefix
     final int minLength = Math.min(start.remaining(), limit.remaining());
     int diffIndex = 0;
