@@ -770,6 +770,8 @@ public class RocksDB extends RocksObject {
    * The ColumnFamilyHandle is automatically disposed with DB disposal.
    *
    * @param columnFamilyDescriptor column family to be created.
+   * @param importColumnFamilyOptions import column family options
+   * @param metadata metadata for external SST files
    * @return {@link org.rocksdb.ColumnFamilyHandle} instance.
    *
    * @throws RocksDBException thrown if error happens in underlying
