@@ -4,7 +4,7 @@
     <groupId>net.sourceforge.streamsupport</groupId>
     <artifactId>schwefel</artifactId>
     <packaging>jar</packaging>
-    <version>8.9.1.1-SNAPSHOT</version>
+    <version>8.9.1.1</version>
     <name>schwefel</name>
     <description>A dead simple RocksDB Java wrapper</description>
     <url>https://github.com/stefan-zobel/schwefel/</url>
