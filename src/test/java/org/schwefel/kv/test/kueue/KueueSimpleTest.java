@@ -47,6 +47,7 @@ public class KueueSimpleTest {
             System.out.println("queue size     : " + queue.size());
 
             System.out.println("done");
+            km.compactAll();
         } catch (Throwable t) {
             t.printStackTrace();
         }
