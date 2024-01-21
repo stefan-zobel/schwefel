@@ -134,7 +134,7 @@ class Transactional implements Tx {
         validateOwned();
         validateReadOptions();
         try {
-            return txn.get(((KindImpl) kind).handle(), readOptions, key);
+            return txn.get(readOptions, ((KindImpl) kind).handle(), key);
         } catch (RocksDBException e) {
             throw new StoreException(e);
         }
