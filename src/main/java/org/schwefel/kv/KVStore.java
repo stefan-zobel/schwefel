@@ -709,7 +709,7 @@ public final class KVStore implements StoreOps, KindManagement {
 
     private void enableObsoleteFilesDeletion() {
         try {
-            txnDb.enableFileDeletions(true);
+            txnDb.enableFileDeletions();
         } catch (RocksDBException e) {
             logger.log(Level.WARNING, "", e);
             throw new StoreException(e);
