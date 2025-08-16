@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, 2023 Stefan Zobel
+ * Copyright 2020, 2025 Stefan Zobel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,7 @@ public final class KVStore implements StoreOps, KindManagement {
 
     private static final Logger logger = Logger.getLogger(KVStore.class.getName());
 
+    private final boolean occasionalWalSync;
     private volatile boolean open = false;
     private long totalSinceLastFsync = 0L;
     private long lastSync;
@@ -76,11 +77,13 @@ public final class KVStore implements StoreOps, KindManagement {
     private FlushOptions flushOptions;
     private FlushOptions flushOptionsNoWait;
     private SstFileManager sstFileManager;
-    private final HashMap<String, KindImpl> kinds = new HashMap<>(); 
+    private final HashMap<String, KindImpl> kinds = new HashMap<>();
     private final String path;
     private final Stats stats = new Stats();
 
     public KVStore(Path dir) {
+        this.occasionalWalSync = Boolean
+                .parseBoolean(System.getProperty(KVStore.class.getName() + ".occasionalWalSync", "true"));
         this.path = (String) wrapEx(() -> Objects.requireNonNull(dir).toFile().getCanonicalPath());
         wrapEx(() -> Files.createDirectories(dir));
         open();
@@ -133,8 +136,7 @@ public final class KVStore implements StoreOps, KindManagement {
                 cfDescs.add(new ColumnFamilyDescriptor(cfName, columnFamilyOptions));
             }
             if (cfDescs.isEmpty()) {
-                cfDescs.add(new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY,
-                        columnFamilyOptions));
+                cfDescs.add(new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY, columnFamilyOptions));
             }
             ArrayList<ColumnFamilyHandle> cfHandles = new ArrayList<>(cfDescs.size());
             TransactionDB txnDb = TransactionDB.open(options, txnDbOptions, path, cfDescs, cfHandles);
@@ -298,7 +300,9 @@ public final class KVStore implements StoreOps, KindManagement {
             txn.put(((KindImpl) kind).handle(), key, value);
             txn.commit();
             stats.putTimeNanos.accept(System.nanoTime() - putStart);
-            occasionalWalSync();
+            if (occasionalWalSync) {
+                occasionalWalSync();
+            }
         }
     }
 
@@ -437,7 +441,9 @@ public final class KVStore implements StoreOps, KindManagement {
             txn.delete(((KindImpl) kind).handle(), key);
             txn.commit();
             stats.deleteTimeNanos.accept(System.nanoTime() - delStart);
-            occasionalWalSync();
+            if (occasionalWalSync) {
+                occasionalWalSync();
+            }
         }
     }
 
@@ -462,7 +468,9 @@ public final class KVStore implements StoreOps, KindManagement {
             txn.singleDelete(((KindImpl) kind).handle(), key);
             txn.commit();
             stats.deleteTimeNanos.accept(System.nanoTime() - delStart);
-            occasionalWalSync();
+            if (occasionalWalSync) {
+                occasionalWalSync();
+            }
         }
     }
 
@@ -482,7 +490,9 @@ public final class KVStore implements StoreOps, KindManagement {
                 long delta = System.nanoTime() - start;
                 stats.allOpsTimeNanos.accept(delta);
                 stats.batchTimeNanos.accept(delta);
-                occasionalWalSync();
+                if (occasionalWalSync) {
+                    occasionalWalSync();
+                }
             }
         }
     }
