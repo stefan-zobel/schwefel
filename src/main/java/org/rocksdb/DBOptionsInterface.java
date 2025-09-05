@@ -1715,6 +1715,7 @@ public interface DBOptionsInterface<T extends DBOptionsInterface<T>> {
    * this field blank. Default: Empty string (no offpeak).
    *
    * @param offpeakTimeUTC String value from which to parse offpeak time range
+   * @return this instance
    */
   T setDailyOffpeakTimeUTC(final String offpeakTimeUTC);
 
