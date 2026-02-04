@@ -59,6 +59,7 @@ public final class KVStore implements StoreOps, KindManagement {
 
     private static final long FLUSH_TIME_WINDOW_MILLIS = 985L;
     private static final long FLUSH_BATCH_SIZE = 16_384L - 1L;
+    private static final long DEFAULT_COMPACTION_MEMTABLE_MEMORY_BUDGET = 192L * 1024L * 1024L;
 
     private static final Logger logger = Logger.getLogger(KVStore.class.getName());
 
@@ -112,6 +113,7 @@ public final class KVStore implements StoreOps, KindManagement {
         columnFamilyOptions.optimizeForSmallDb();
         columnFamilyOptions.setPeriodicCompactionSeconds(1L * 24L * 60L * 60L);
         columnFamilyOptions.setOptimizeFiltersForHits(true);
+        columnFamilyOptions.optimizeLevelStyleCompaction(DEFAULT_COMPACTION_MEMTABLE_MEMORY_BUDGET);
         columnFamilyOptions.setTableFormatConfig(sstFileFormat);
         writeOptions = new WriteOptions();
         readOptions = new ReadOptions();
